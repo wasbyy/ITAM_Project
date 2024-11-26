@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Header from "$lib/components/Header.svelte";
     let login: string = '';
     let password: string = '';
     const handleLogin = () => {
@@ -17,7 +18,7 @@
         margin: 0;
         padding: 0;
         font-family: 'DM Sans', sans-serif;
-        background-color: #1D1E22; /* Темный фон */
+        background-color: #1e1d1c; /* Темный фон */
         color: white; /* Белый текст */
         display: flex;
         justify-content: center;
@@ -67,11 +68,13 @@
     }
 
     .login-container h1 {
-        font-size: 2rem; /* Увеличенный размер заголовка */
-        margin-bottom: 2rem;
-        color: #e0e0e0; /* Основной акцентный цвет */
-        font-weight: bold;
-    }
+    font-size: 2rem; /* Увеличенный размер заголовка */
+    margin-top: -0.5rem; /* Поднимаем заголовок вверх */
+    margin-bottom: 2rem; /* Уменьшенный отступ снизу */
+    color: #e0e0e0; /* Основной акцентный цвет */
+    font-weight: bold;
+}
+
 
     .login-container input {
         width: 100%; /* Поля растянуты по ширине */
@@ -90,6 +93,8 @@
     .login-container input:focus {
         background: rgba(255, 255, 255, 0.2); /* Подсветка при фокусе */
     }
+/* Импорт пиксельного шрифта */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
     /* Стиль кнопки с градиентной анимацией */
     .btn {
@@ -101,9 +106,12 @@
         border-radius: 20px; /* Округлые края */
         font-size: 1.1rem; /* Уменьшенный размер шрифта */
         border: none;
-        width: 100%; /* Ширина по всей панели */
+        width: 50%; /* Ширина по всей панели */
         animation: gradientAnimation 4s linear infinite; /* Анимация переливания */
         transition: all 0.3s ease; /* Плавный переход */
+        font-family: "Pixelify Sans", serif;
+        font-weight: 100;
+        font-size: 20px;        
     }
 
     /* Анимация плавного переливания градиента */
@@ -131,6 +139,7 @@
 </style>
 
 <div class="login-container">
+    <Header />
     <h1 class="title">Вход</h1>
     <input type="text" placeholder="Логин" bind:value={login} />
     <input type="password" placeholder="Пароль" bind:value={password} />
