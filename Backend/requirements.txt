@@ -1,7 +1,0 @@
-fastapi
-uvicorn
-sqlalchemy
-python-dotenv
-alembic
-gunicorn
-psycopg2-binary
