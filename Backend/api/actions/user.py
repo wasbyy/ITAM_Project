@@ -40,6 +40,7 @@ async def _get_user_by_id(user_id: int, session) -> ShowUser:
                     user_id=user.user_id,
                     name=user.name,
                     surname=user.surname,
+                    role = user.role,
                     email=user.email,
                     age=user.age,
                     course=user.course,
