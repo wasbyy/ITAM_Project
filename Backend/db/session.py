@@ -1,6 +1,3 @@
-##############################################
-# BLOCK FOR COMMON INTERACTION WITH DATABASE #
-##############################################
 from typing import Generator
 
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession

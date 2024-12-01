@@ -1,28 +1,35 @@
 from typing import List
 
-from fastapi import FastAPI, Depends, HTTPException, APIRouter, Path
-from sqlalchemy import select, true, false
+from fastapi import Depends, HTTPException, APIRouter, Path, File, UploadFile
+from sqlalchemy import select, true, func
 from sqlalchemy.ext.asyncio import AsyncSession
+import io
 
 from api.actions.admin import _create_new_admin
 from api.actions.events import _create_new_event, _archive_event, _get_event_by_id, _update_event
-from api.actions.registrations import _check_registrate, _create_new_registration
+from api.actions.registrations import _create_new_registration
 from api.actions.user import _create_new_user, _get_user_by_id, _update_user
 from db.models import Event, User, Registration
 from db.session import get_db
 from api.models import EventCreate, ShowEvent, EventCard, EventUpdateRequest, UpdateEventResponse, UserCreate, ShowUser, \
     ShowAdmin, AdminCreate, UserCard, UpdateUserResponse, UserUpdateRequest, RegistrationResponse, RegistrationCreate, \
     ShowRegistrationUser, ShowEventInUserCab
+from fastapi.responses import StreamingResponse, JSONResponse
+from io import BytesIO
 
 event_router = APIRouter()
 user_router = APIRouter()
-
 registration = APIRouter()
 admin_router = APIRouter()
+images_router = APIRouter()
 
-@event_router.post("/events", response_model=ShowEvent)
-async def create_event(body: EventCreate, db: AsyncSession = Depends(get_db)):
-    return await _create_new_event(body, db)
+@event_router.post("/events")
+async def create_event(body: EventCreate, file: UploadFile = File(...), db: AsyncSession = Depends(get_db)):
+    if not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="Uploaded file is not an image")
+    # Читаем данные файла
+    file_data = await file.read()
+    return await _create_new_event(file_data, body, db)
 
 #Показать все активные мероприятия(для главной страницы)
 @event_router.get("/events", response_model=List[EventCard])
@@ -36,7 +43,17 @@ async def show_all_active_events(db: AsyncSession = Depends(get_db)):
 async def show_event(event_id: int, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Event).where(Event.event_id == event_id))
     event = result.scalars().first()
-    return event
+    if not event:
+        raise HTTPException(status_code=404, detail=f"Event with ID {event_id} not found")
+    image_stream = BytesIO(event.image)
+    # return event
+    return StreamingResponse(image_stream, media_type="image/jpeg")
+    # headers = {
+    #     "Content-Type": "application/json",
+    #     "X-Image-Stream": f"/stream-image/{event_id}"
+    # }
+    #
+    # return JSONResponse(content={"data": event}, headers=headers)
 
 #Архивировать мероприятие
 @event_router.patch("/archive_events/{event_id}")
@@ -56,6 +73,30 @@ async def update_event_by_id(event_id: int, body: EventUpdateRequest, db: AsyncS
         raise HTTPException(status_code=404, detail=f"Event with id: {event_id} not found")
     updated_event_id = await _update_event(updated_event_params=updated_event_params, session=db, event_id=event_id)
     return UpdateEventResponse(updated_event_id = updated_event_id)
+
+@event_router.get("/event_members/{event_id}", response_model=List[ShowRegistrationUser])
+async def show_members_on_event(event_id: int = Path(..., gt=0), db: AsyncSession = Depends(get_db)):
+    query = (
+        select(User.name, User.surname, Registration.time_of_registration)
+        .join(Registration, Registration.user_id == User.user_id)
+        .join(Event, Event.event_id == Registration.event_id)
+        .where(Event.event_id == event_id)
+    )
+    result = await db.execute(query)
+    members = result.all()
+
+    members_info = [
+        ShowRegistrationUser(name=name, surname=surname, time_of_registration=time_of_registration) for name, surname, time_of_registration in members
+    ]
+
+    return members_info
+
+@event_router.get("/count_members/{event_id}")
+async def count_events(event_id: int, db: AsyncSession = Depends(get_db)):
+    query = select(func.count()).select_from(Registration).where(Registration.event_id == event_id)
+    result = await db.execute(query)
+    counter = result.scalar_one()
+    return counter
 
 @user_router.post("/create_user", response_model=ShowUser)
 async def create_user(body: UserCreate, db: AsyncSession = Depends(get_db)):
@@ -100,24 +141,6 @@ async def create_registration(body: RegistrationCreate, db: AsyncSession = Depen
     #     raise HTTPException(status_code=400, detail="Already registered for this event")
     return await _create_new_registration(body, db)
 
-@event_router.get("/event_members/{event_id}", response_model=List[ShowRegistrationUser])
-async def show_members_on_event(event_id: int = Path(..., gt=0), db: AsyncSession = Depends(get_db)):
-    query = (
-        select(User.name, User.surname)
-        .join(Registration, Registration.user_id == User.user_id)
-        .join(Event, Event.event_id == Registration.event_id)
-        .where(Event.event_id == event_id)
-    )
-    result = await db.execute(query)
-    members = result.all()
-
-    members_info = [
-        ShowRegistrationUser(name=name, surname=surname) for name, surname in members
-    ]
-
-    return members_info
-
-
 @user_router.get("/user_events/{user_id}", response_model=List[ShowEventInUserCab])
 async def show_user_events(user_id: int = Path(..., gt=0), db: AsyncSession = Depends(get_db)):
     query = (
@@ -132,5 +155,46 @@ async def show_user_events(user_id: int = Path(..., gt=0), db: AsyncSession = De
     events_info = [
         ShowEventInUserCab(event_name=str(event_name)) for (event_name,) in events
     ]
-
     return events_info
+
+
+# @images_router.post("/upload_event_image/{event_id}")
+# async def upload_image(event_id: int, file: UploadFile = File(...), db: AsyncSession = Depends(get_db)):
+#     # Проверяем тип файла
+#     if not file.content_type.startswith("image/"):
+#         raise HTTPException(status_code=400, detail="Uploaded file is not an image")
+#
+#     # Читаем данные файла
+#     file_data = await file.read()
+#
+#     # Сохраняем в базу данных
+#     new_image = Image(event_id=event_id, data=file_data)
+#     db.add(new_image)
+#     await db.commit()
+#     await db.refresh(new_image)
+#
+#     return {"message": f"Image for event {event_id} uploaded successfully"}
+
+# @images_router.get("/show_event_image/{event_id}")
+# async def download_image(event_id: int, db: AsyncSession = Depends(get_db)):
+#     # Получаем изображение из базы данных
+#     result = await db.execute(select(Image).where(Image.event_id == event_id))
+#     image = result.scalars().first()
+#     if not image:
+#         raise HTTPException(status_code=404, detail="Image not found")
+#
+#     # Преобразуем бинарные данные в поток
+#     image_stream = BytesIO(image.data)
+#     return StreamingResponse(image_stream, media_type="image/jpeg")
+
+# @event_router.get("/stream-image/{event_id}")
+# async def stream_image(event_id: int, db: AsyncSession = Depends(get_db)):
+#     result = await db.execute(select(Event).where(Event.event_id == event_id))
+#     event = result.scalars().first()
+#
+#     if not event:
+#         raise HTTPException(status_code=404, detail=f"Event with ID {event_id} not found")
+#
+#     image_stream = io.BytesIO(event.image)
+#
+#     return StreamingResponse(image_stream, media_type="image/jpeg")

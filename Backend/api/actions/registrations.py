@@ -1,7 +1,7 @@
-from fastapi import Depends, HTTPException
+from fastapi import Depends
 from sqlalchemy import select
 
-from api.models import RegistrationCreate, ShowRegistrationUser
+from api.models import RegistrationCreate
 from db.dals import RegistrationDAL
 from db.models import Registration
 from db.session import get_db

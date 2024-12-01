@@ -1,10 +1,12 @@
 from typing import Union
 from uuid import UUID
 
+from fastapi import UploadFile, File
 from sqlalchemy import and_, update, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from db.models import Event, User
+from api.actions.images import upload_image
+from db.models import Event, User, Registration
 
 
 class EventDAL:
@@ -12,9 +14,10 @@ class EventDAL:
         self.db_session = db_session
 
     async def create_event(self, event_name: str, place: str, short_description: str, long_description: str, max_count_of_members: int,
-                           online_event_link:str, format: str, tags: str) -> Event:
+                           online_event_link:str, format: str, tags: str, image) -> Event:
         new_event = Event(
             event_name=event_name,
+            image = image,
             place=place,
             short_description=short_description,
             long_description=long_description,
@@ -57,10 +60,10 @@ class UserDAL:
         self.db_session = db_session
 
     async def create_user(
-        self, name: str, surname: str, email: str, hashed_password: str, age: int,
+        self, name: str, email: str, hashed_password: str, telephone_number: int,
         course: int, university_group: str) -> User:
         new_user = User(
-            name=name, surname=surname, email=email, hashed_password=hashed_password, role="user", age=age,
+            name=name, email=email, hashed_password=hashed_password, role="user", telephone_number=telephone_number,
             course=course, university_group=university_group
         )
         self.db_session.add(new_user)
@@ -91,14 +94,33 @@ class AdminDAL():
         self.db_session = db_session
 
     async def create_admin(
-            self, name: str, surname: str, email: str, hashed_password: str, age: int = None,
+            self, name: str, email: str, hashed_password: str, telephone_number: int = None,
             course: int = None, university_group: str = None) -> User:
         new_user = User(
-            name=name, surname=surname, email=email, hashed_password=hashed_password, role="admin", age=age,
+            name=name, email=email, hashed_password=hashed_password, role="admin", telephone_number=telephone_number,
             course=course, university_group = university_group
         )
         self.db_session.add(new_user)
         await self.db_session.flush()
         return new_user
 
+class RegistrationDAL():
+    def __init__(self, db_session=AsyncSession):
+        self.db_session = db_session
 
+    async def create_registration(
+            self, user_id, event_id,
+    ):
+        new_registrations = Registration(
+            user_id=user_id, event_id=event_id
+        )
+        self.db_session.add(new_registrations)
+        await self.db_session.flush()
+        return new_registrations
+
+    async def get_user_in_registration_by_id(self, user_id: int) -> Union[User, None]:
+        query = select(User).where(User.user_id == user_id)
+        res = await self.db_session.execute(query)
+        users_row = res.fetchone()
+        if users_row is not None:
+            return users_row[0]

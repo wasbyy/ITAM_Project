@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Optional
 
+from fastapi import UploadFile
 from pydantic import BaseModel, constr
 
 
@@ -9,11 +11,11 @@ from pydantic import BaseModel, constr
 class TunedModel(BaseModel):
     class Config:
         """tells pydantic to convert even non dict obj to json"""
-
         orm_mode = True
 
 class EventCreate(BaseModel):
     event_name: str
+    # image: bytes
     place: str
     short_description: str
     long_description: str
@@ -24,6 +26,7 @@ class EventCreate(BaseModel):
 
 class ShowEvent(TunedModel):
     event_name: str
+    # image: bytes
     place: str
     long_description: str
     max_count_of_members: int
@@ -43,6 +46,7 @@ class EventUpdateRequest(BaseModel):
 
 class EventCard(TunedModel):
     event_id: int
+    # image: bytes
     event_name: str
     short_description: str
     place: str
@@ -53,49 +57,43 @@ class UpdateEventResponse(BaseModel):
 
 class UserCreate(BaseModel):
     name: str
-    surname: str
     email: str
     password: str
-    age: int
+    telephone_number: int
     course: int
     university_group: str
 
 class ShowUser(BaseModel):
     user_id: int
     name: str
-    surname: str
     email: str
-    age: int
+    telephone_number: int
     course: int
     university_group: str
 
 class AdminCreate(BaseModel):
     name: str
-    surname: str
     email: str
     password: str
 
 class ShowAdmin(BaseModel):
     user_id: int
     name: str
-    surname: str
     email: str
 
 class UserCard(TunedModel):
     user_id: int
     name: str
-    surname: str
     email: str
     role: str
-    age: Optional[int] = None
+    telephone_number: Optional[int] = None
     course: Optional[int] = None
     university_group: Optional[str] = None
 
 class UserUpdateRequest(BaseModel):
     name: Optional[constr(min_length=1)]
-    surname: Optional[constr(min_length=1)]
     email: Optional[constr(min_length=1)]
-    age: Optional[int]
+    telephone_number: Optional[int]
     course: Optional[int]
     university_group: Optional[constr(min_length=1)]
 
@@ -111,7 +109,8 @@ class RegistrationResponse(BaseModel):
 
 class ShowRegistrationUser(TunedModel):
     name: str
-    surname: str
+    time_of_registration: datetime
 
 class ShowEventInUserCab(TunedModel):
     event_name: str
+

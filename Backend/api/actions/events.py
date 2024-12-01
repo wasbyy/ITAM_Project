@@ -1,12 +1,16 @@
+from fastapi import UploadFile, File
+
+from api.actions.images import upload_image, download_image
 from api.models import EventCreate, ShowEvent
 from db.dals import EventDAL
 
 
-async def _create_new_event(body: EventCreate, session):
+async def _create_new_event(file: bytes, body: EventCreate, session):
     async with session.begin():
         event_dal = EventDAL(session)
         event = await event_dal.create_event(
         event_name=body.event_name,
+        image = file,
         place=body.place,
         short_description = body.short_description,
         long_description=body.long_description,
@@ -15,18 +19,8 @@ async def _create_new_event(body: EventCreate, session):
         online_event_link=body.online_event_link,
         tags=body.tags
         )
-        return ShowEvent(
-        event_id = event.event_id,
-        event_name = event.event_name,
-        place = event.place,
-        short_description=event.short_description,
-        long_description = event.long_description,
-        max_count_of_members = event.max_count_of_members,
-        online_event_link = event.online_event_link,
-        format = event.format,
-        tags = event.tags,
-        is_active = event.is_active
-        )
+        return {"message": f"Image for event {event.event_name} uploaded successfully"}
+
 
 async def _archive_event(event_id, session):
     async with session.begin():
@@ -56,3 +50,5 @@ async def _get_event_by_id(event_id: int, session) -> ShowEvent:
                 tags=event.tags,
                 is_active=event.is_active
             )
+
+

@@ -1,5 +1,5 @@
 from api.models import AdminCreate, ShowAdmin
-from db.dals import UserDAL, AdminDAL
+from db.dals import AdminDAL
 from hashing import Hasher
 
 
@@ -8,14 +8,12 @@ async def _create_new_admin(body: AdminCreate, session) -> ShowAdmin:
             admin_dal = AdminDAL(session)
             admin = await admin_dal.create_admin(
                 name=body.name,
-                surname=body.surname,
                 email=body.email,
                 hashed_password=Hasher.get_password_hash(body.password),
             )
             return ShowAdmin(
             user_id = admin.user_id,
             name = admin.name,
-            surname = admin.surname,
             email = admin.email,
             )
 

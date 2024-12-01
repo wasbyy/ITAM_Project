@@ -8,19 +8,17 @@ async def _create_new_user(body: UserCreate, session) -> ShowUser:
             user_dal = UserDAL(session)
             user = await user_dal.create_user(
                 name=body.name,
-                surname=body.surname,
                 email=body.email,
                 hashed_password=Hasher.get_password_hash(body.password),
-                age = body.age,
+                telephone_number = body.telephone_number,
                 course = body.course,
                 university_group = body.university_group
             )
             return ShowUser(
             user_id = user.user_id,
             name = user.name,
-            surname = user.surname,
             email = user.email,
-            age = user.age,
+            telephone_number = user.telephone_number,
             course = user.course,
             university_group = user.university_group
             )
@@ -39,7 +37,6 @@ async def _get_user_by_id(user_id: int, session) -> ShowUser:
                 return ShowUser(
                     user_id=user.user_id,
                     name=user.name,
-                    surname=user.surname,
                     role = user.role,
                     email=user.email,
                     age=user.age,
