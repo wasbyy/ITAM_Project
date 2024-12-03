@@ -18,12 +18,12 @@ async def _check_registrate(registration_data: RegistrationCreate, db=Depends(ge
     return existing_registration
 
 # Создание новой регистрации
-async def _create_new_registration(body: RegistrationCreate, session):
+async def _create_new_registration(user_id, event_id, session):
     async with session.begin():
         registration_dal = RegistrationDAL(session)
         registration = await registration_dal.create_registration(
-            user_id=body.user_id,
-            event_id=body.event_id,
+            user_id=user_id,
+            event_id=event_id,
         )
         if registration:
             return {"resp": "Successfully registered"}

@@ -10,7 +10,7 @@ class Event(Base):
     __tablename__ = 'events'
     event_id = Column(Integer, primary_key=True)
     event_name = Column(String, nullable=False)
-    image = Column(LargeBinary, nullable=False)
+    # image = Column(LargeBinary, nullable=False)
     place = Column(String, nullable=False)
     short_description = Column(String, nullable=True)
     long_description = Column(String, nullable=True)
@@ -44,11 +44,11 @@ class Registration(Base):
     user = relationship('User', back_populates='registrations')
     event = relationship('Event', back_populates='registrations')
 
-# class Image(Base):
-#     __tablename__ = 'images'
-#     id = Column(Integer, primary_key=True)
-#     event_id = Column(Integer, ForeignKey('events.event_id'))
-#     data = Column(LargeBinary, nullable=False)
+class Image(Base):
+    __tablename__ = 'images'
+    id = Column(Integer, primary_key=True)
+    event_id = Column(Integer, ForeignKey('events.event_id'))
+    data = Column(LargeBinary, nullable=False)
 
 
 

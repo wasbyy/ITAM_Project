@@ -14,10 +14,10 @@ class EventDAL:
         self.db_session = db_session
 
     async def create_event(self, event_name: str, place: str, short_description: str, long_description: str, max_count_of_members: int,
-                           online_event_link:str, format: str, tags: str, image) -> Event:
+                           online_event_link:str, format: str, tags: str) -> Event:
         new_event = Event(
             event_name=event_name,
-            image = image,
+            # image = image,
             place=place,
             short_description=short_description,
             long_description=long_description,
@@ -84,6 +84,13 @@ class UserDAL:
 
     async def get_user_by_id(self, user_id: UUID) -> Union[User, None]:
         query = select(User).where(User.user_id == user_id)
+        res = await self.db_session.execute(query)
+        user_row = res.fetchone()
+        if user_row is not None:
+            return user_row[0]
+
+    async def get_user_by_email(self, email: str) -> Union[User, None]:
+        query = select(User).where(User.email == email)
         res = await self.db_session.execute(query)
         user_row = res.fetchone()
         if user_row is not None:

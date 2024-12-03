@@ -5,12 +5,12 @@ from api.models import EventCreate, ShowEvent
 from db.dals import EventDAL
 
 
-async def _create_new_event(file: bytes, body: EventCreate, session):
+async def _create_new_event(body: EventCreate, session):
     async with session.begin():
         event_dal = EventDAL(session)
-        event = await event_dal.create_event(
+        await event_dal.create_event(
         event_name=body.event_name,
-        image = file,
+        # image = file,
         place=body.place,
         short_description = body.short_description,
         long_description=body.long_description,
@@ -19,7 +19,7 @@ async def _create_new_event(file: bytes, body: EventCreate, session):
         online_event_link=body.online_event_link,
         tags=body.tags
         )
-        return {"message": f"Image for event {event.event_name} uploaded successfully"}
+        return {"message": f"Event created"}
 
 
 async def _archive_event(event_id, session):

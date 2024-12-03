@@ -1,5 +1,6 @@
 from api.models import UserCreate, ShowUser
 from db.dals import UserDAL
+from db.models import User
 from hashing import Hasher
 
 
@@ -39,7 +40,12 @@ async def _get_user_by_id(user_id: int, session) -> ShowUser:
                     name=user.name,
                     role = user.role,
                     email=user.email,
-                    age=user.age,
+                    telephone_number=user.telephone_number,
                     course=user.course,
                     university_group=user.university_group
                 )
+
+def check_user_permissions(target_user: User) -> bool:
+    if target_user.role != "admin":
+            return False
+    return True

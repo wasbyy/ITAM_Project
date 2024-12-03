@@ -114,3 +114,8 @@ class ShowRegistrationUser(TunedModel):
 class ShowEventInUserCab(TunedModel):
     event_name: str
 
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
