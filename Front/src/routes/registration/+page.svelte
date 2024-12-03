@@ -1,37 +1,95 @@
 <script lang="ts">
-    import Header from "$lib/components/Header.svelte";
-
-    // Поля формы регистрации
-    let fullName: string = '';
-    let birthDate: string = '';
-    let phoneNumber: string = '';
+    import { goto } from '$app/navigation'; // SvelteKit
+    import Icon from '$lib/components/Icon.svelte';
+    // Поля формы
+    let name: string = '';
     let email: string = '';
-    let studyGroup: string = '';
-    let course: string = '';
+    let password: string = '';
+    let telephone_number: number | null = null;
+    let course: number | null = null;
+    let university_group: string = '';
+    
 
-    // Обработчик отправки формы
-    const handleRegister = () => {
-        if (fullName && birthDate && phoneNumber && email && studyGroup && course) {
-            console.log('ФИО:', fullName);
-            console.log('Дата рождения:', birthDate);
-            console.log('Номер:', phoneNumber);
-            console.log('Почта:', email);
-            console.log('Учебная группа:', studyGroup);
-            console.log('Курс:', course);
-        } else {
-            console.log('Заполните все поля!');
-        }
+    // Состояние для уведомлений
+    let notificationMessage: string = '';
+    let notificationType: 'success' | 'error' | 'info' = 'info';
+
+    // URL API
+    const BASE_URL = 'http://130.193.52.139:8000';
+
+    // Функция для отображения уведомлений
+    const showNotification = (message: string, type: 'success' | 'error' | 'info') => {
+        notificationMessage = message;
+        notificationType = type;
+
+        // Скрыть уведомление через 3 секунды
+        setTimeout(() => {
+            notificationMessage = '';
+        }, 3000);
     };
-</script>
 
+    // Обработчик регистрации
+    const handleRegister = async () => {
+    if (name && email && password && telephone_number && course && university_group) {
+        const registrationData = {
+            name,
+            email,
+            password,
+            telephone_number,
+            course,
+            university_group,
+        };
+
+        // Логируем данные перед отправкой
+        console.log('Данные для регистрации:', registrationData);
+        console.log('URL для запроса:', `${BASE_URL}/create_user`);
+
+        try {
+            const response = await fetch(`${BASE_URL}/create_user`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(registrationData),
+            });
+
+            // Логируем объект ответа
+            console.log('Ответ от сервера (RAW):', response);
+
+            if (response.ok) {
+                const result = await response.json();
+
+                // Логируем результат успешного ответа
+                console.log('Успешный ответ от сервера:', result);
+                showNotification('Регистрация успешна!', 'success');
+                goto('/mainpage'); // Переход на главную страницу
+            } else {
+                // Логируем, если ответ не OK
+                const error = await response.json();
+                console.error('Ошибка регистрации:', error);
+                showNotification(`Ошибка: ${error.detail || 'Неизвестная ошибка'}`, 'error');
+            }
+        } catch (err) {
+            // Логируем ошибки сети или запроса
+            console.error('Ошибка при выполнении запроса:', err);
+            showNotification('Сервер недоступен. Проверьте подключение.', 'error');
+        }
+    } else {
+        // Логируем, если поля формы не заполнены
+        console.warn('Не все поля заполнены. Проверьте форму.');
+        showNotification('Пожалуйста, заполните все поля!', 'info');
+    }
+};
+
+</script>
 <style>
     /* Общий стиль для страницы */
     :global(body) {
         margin: 0;
         padding: 0;
-        font-family: 'DM Sans', sans-serif;
-        background-color: #1e1d1c; /* Темный фон */
-        color: white; /* Белый текст */
+        font-family: "Inter", sans-serif;
+        background-color: #1e1d1c;
+        color: white;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -48,7 +106,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6); /* Более яркая тень */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
     }
 
     /* Градиентная обводка */
@@ -110,7 +168,6 @@
         width: 80%;
         animation: buttonGradient 2s linear infinite;
         transition: all 0.3s ease;
-        font-family: "Pixelify Sans", serif;
         font-weight: 100;
         font-size: 20px;
     }
@@ -130,16 +187,68 @@
         transform: scale(0.95);
         box-shadow: 0 4px 10px rgba(0, 255, 0, 0.3);
     }
+
+    /* Стиль для уведомлений */
+    .notification {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #333;
+        color: rgb(255, 255, 255);
+        padding: 1rem;
+        border-radius: 10px;
+        font-size: 1rem;
+        z-index: 1000;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 300px;
+        opacity: 1;
+        transition: opacity 0.3s ease-out;
+    }
+
+    .notification.success {
+        background-color: #28a745;
+    }
+
+    .notification.error {
+        background-color: #dc3545;
+    }
+
+    .notification.info {
+        background-color: #ffc107;
+    }
+
+    .notification.hidden {
+        opacity: 0;
+    }
+
+    .notification button {
+        background: none;
+        border: none;
+        color: rgb(255, 255, 255);
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
 </style>
 
+<Icon id="logo"/>
+
 <div class="login-container">
-    <Header />
     <h1 class="title">Регистрация</h1>
-    <input type="text" placeholder="ФИО" bind:value={fullName} />
-    <input type="date" placeholder="Дата рождения" bind:value={birthDate} />
-    <input type="tel" placeholder="Номер телефона" bind:value={phoneNumber} />
+    <input type="text" placeholder="Имя" bind:value={name} />
     <input type="email" placeholder="Почта" bind:value={email} />
-    <input type="text" placeholder="Учебная группа" bind:value={studyGroup} />
-    <input type="text" placeholder="Курс" bind:value={course} />
+    <input type="password" placeholder="Пароль" bind:value={password} />
+    <input type="tel" placeholder="Номер телефона" bind:value={telephone_number} />
+    <input type="number" placeholder="Курс" bind:value={course} />
+    <input type="text" placeholder="Учебная группа" bind:value={university_group} />
     <button class="btn" on:click={handleRegister}>Зарегистрироваться</button>
 </div>
+
+{#if notificationMessage}
+  <div class="notification {notificationType}">
+    {notificationMessage}
+    <button on:click={() => notificationMessage = ''}>×</button>
+  </div>
+{/if}

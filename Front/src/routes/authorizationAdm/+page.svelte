@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Header from "$lib/components/Header.svelte";
+    import Icon from "$lib/components/Icon.svelte";
     let login: string = '';
     let password: string = '';
     const handleLogin = () => {
@@ -17,7 +17,7 @@
     :global(body) {
         margin: 0;
         padding: 0;
-        font-family: 'DM Sans', sans-serif;
+        font-family: "Inter", sans-serif;
         background-color: #1e1d1c; /* Темный фон */
         color: white; /* Белый текст */
         display: flex;
@@ -109,7 +109,6 @@
         width: 50%; /* Ширина по всей панели */
         animation: gradientAnimation 4s linear infinite; /* Анимация переливания */
         transition: all 0.3s ease; /* Плавный переход */
-        font-family: "Pixelify Sans", serif;
         font-weight: 100;
         font-size: 20px;        
     }
@@ -138,8 +137,8 @@
     }
 </style>
 
+<Icon id="logo"/>
 <div class="login-container">
-    <Header />
     <h1 class="title">Вход</h1>
     <input type="text" placeholder="Логин" bind:value={login} />
     <input type="password" placeholder="Пароль" bind:value={password} />
