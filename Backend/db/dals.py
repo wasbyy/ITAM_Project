@@ -1,5 +1,7 @@
+from datetime import datetime
 from typing import Union
 from uuid import UUID
+import secrets
 
 from fastapi import UploadFile, File
 from sqlalchemy import and_, update, select
@@ -8,23 +10,22 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from api.actions.images import upload_image
 from db.models import Event, User, Registration
 
-
 class EventDAL:
     def __init__(self, db_session=AsyncSession):
         self.db_session = db_session
 
     async def create_event(self, event_name: str, place: str, short_description: str, long_description: str, max_count_of_members: int,
-                           online_event_link:str, format: str, tags: str) -> Event:
+                           online_event_link:str, format: str, date: datetime, tags: str) -> Event:
         new_event = Event(
             event_name=event_name,
-            # image = image,
             place=place,
             short_description=short_description,
             long_description=long_description,
             max_count_of_members=max_count_of_members,
             online_event_link=online_event_link,
+            date = date,
             format = format,
-            tags=tags
+            tags=tags,
 )
         self.db_session.add(new_event)
         await self.db_session.flush()
@@ -60,11 +61,12 @@ class UserDAL:
         self.db_session = db_session
 
     async def create_user(
-        self, name: str, email: str, hashed_password: str, telephone_number: int,
-        course: int, university_group: str) -> User:
+        self, name: str, email: str, hashed_password: str, telephone_number: str, telegram_id: str,
+        course: int, university_group: str, confirmation_token: str, is_active: bool =  False) -> User:
         new_user = User(
-            name=name, email=email, hashed_password=hashed_password, role="user", telephone_number=telephone_number,
-            course=course, university_group=university_group
+            name=name, telegram_id = telegram_id, email=email, hashed_password=hashed_password, role="user",
+            telephone_number=telephone_number, course=course, university_group=university_group,
+            confirmation_token = confirmation_token, is_active=is_active
         )
         self.db_session.add(new_user)
         await self.db_session.flush()
@@ -101,11 +103,12 @@ class AdminDAL():
         self.db_session = db_session
 
     async def create_admin(
-            self, name: str, email: str, hashed_password: str, telephone_number: int = None,
-            course: int = None, university_group: str = None) -> User:
+            self, name: str, email: str, hashed_password: str, telephone_number: str = None,
+            course: int = None, university_group: str = None, telegram_id: str = None, confirmation_token: str = None) -> User:
         new_user = User(
-            name=name, email=email, hashed_password=hashed_password, role="admin", telephone_number=telephone_number,
-            course=course, university_group = university_group
+            name=name, email=email, telegram_id = telegram_id, hashed_password=hashed_password, role="admin",
+            telephone_number=telephone_number,course=course, university_group = university_group,
+            confirmation_token= confirmation_token, is_active=True
         )
         self.db_session.add(new_user)
         await self.db_session.flush()

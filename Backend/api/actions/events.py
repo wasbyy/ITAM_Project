@@ -1,6 +1,3 @@
-from fastapi import UploadFile, File
-
-from api.actions.images import upload_image, download_image
 from api.models import EventCreate, ShowEvent
 from db.dals import EventDAL
 
@@ -10,12 +7,12 @@ async def _create_new_event(body: EventCreate, session):
         event_dal = EventDAL(session)
         await event_dal.create_event(
         event_name=body.event_name,
-        # image = file,
         place=body.place,
         short_description = body.short_description,
         long_description=body.long_description,
         max_count_of_members=body.max_count_of_members,
         format=body.format,
+        date=body.date,
         online_event_link=body.online_event_link,
         tags=body.tags
         )
@@ -47,6 +44,7 @@ async def _get_event_by_id(event_id: int, session) -> ShowEvent:
                 max_count_of_members=event.max_count_of_members,
                 online_event_link=event.online_event_link,
                 format = event.format,
+                date=event.date,
                 tags=event.tags,
                 is_active=event.is_active
             )

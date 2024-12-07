@@ -4,17 +4,15 @@ from typing import Union
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from jose import jwt, JWTError
-from pydantic.validators import none_validator
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from db.settings import ACCESS_TOKEN_EXPIRE_MINUTES, SECRET_KEY, ALGORITHM
-from api.models import Token
+from db.settings import  SECRET_KEY, ALGORITHM
 from db.dals import UserDAL
 from db.models import User
 from db.session import get_db
 from hashing import Hasher
-from security import create_access_token
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login/token")
 
@@ -32,6 +30,8 @@ async def authenticate_user(
     user = await _get_user_by_email_for_auth(email=email, session=db)
     if user is None:
         return
+    if user.is_active == False:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail= "User not confirmed")
     if not Hasher.verify_password(password, user.hashed_password):
         return
     return user
