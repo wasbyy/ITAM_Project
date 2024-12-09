@@ -8,7 +8,7 @@
   export let left = true; // Позиция иконки (по умолчанию слева)
 
   function navigateHome() {
-      goto('http://localhost:5173/mainpage'); // Перенаправляем пользователя на главную страницу
+      goto('http://localhost:5173/'); // Перенаправляем пользователя на главную страницу
   }
 </script>
 

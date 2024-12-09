@@ -363,7 +363,7 @@
 
 <div class="container">
     <!-- Логотип -->
-    <a href="http://localhost:5173/mainpage">
+    <a href="http://localhost:5173/">
         <img src="/itam_logo.png" alt="Логотип" class="logo" />
     </a>
     

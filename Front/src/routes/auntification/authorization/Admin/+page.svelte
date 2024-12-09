@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { goto } from "$app/navigation";
     import Icon from "$lib/components/Icon.svelte";
     let username: string = '';
     let password: string = '';
@@ -38,7 +39,7 @@
                 if (response.ok) {
                     console.log('Login successful:', data);
                     localStorage.setItem('auth_token', data.access_token);
-                    window.location.href = '/mainpage';
+                    goto('/')
                 } else {
                     console.log('Error:', data.message || 'Что-то пошло не так');
                 }

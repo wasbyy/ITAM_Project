@@ -42,19 +42,19 @@
   });
 
   // Функция для создания нового мероприятия
-  function createEvent() {
-    goto('/AddEvent'); // Переход на страницу создания мероприятия
-  }
+  // function createEvent() {
+  //   goto('/AddEvent'); // Переход на страницу создания мероприятия
+  // }
 
   // Переход в архив
-  function goToArchive() {
-    goto('/archieve/Admin');
-  }
+  // function goToArchive() {
+  //   goto('/archieve/Admin');
+  // }
 </script>
 
 <div class="container">
   <!-- Логотип -->
-  <a href="/mainpage">
+  <a href="/">
     <img src="/itam_logo.png" alt="Логотип" class="logo" />
   </a>
 
@@ -72,8 +72,8 @@
     <div class="events-header">
       <h2>МЕРОПРИЯТИЯ</h2>
       <div class="buttons-right">
-        <button class="archive-btn" on:click={goToArchive}>АРХИВ</button>
-        <button class="create-btn" on:click={createEvent}>+</button>
+        <button class="archive-btn" on:click={()=>goto('/archieve/Admin')}>АРХИВ</button>
+        <button class="create-btn" on:click={()=>goto('/AddEvent')}>+</button>
       </div>
     </div>
 

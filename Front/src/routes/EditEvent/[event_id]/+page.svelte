@@ -1,45 +1,48 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-  import { onMount } from 'svelte';
+  import { page } from "$app/stores";
+  import { onMount } from "svelte";
   import Icon from "$lib/components/Icon.svelte";
 
   let eventId: string;
 
   // Данные мероприятия
   let eventData = {
-    event_name: '',
-    place: '',
-    long_description: '',
-    short_description: '',
+    event_name: "",
+    place: "",
+    long_description: "",
+    short_description: "",
     max_count_of_members: 0,
-    online_event_link: '',
-    format: 'offline',
-    date: '',
-    tags: ''
+    online_event_link: "",
+    format: "offline",
+    date: "",
+    tags: "",
   };
 
   // Отдельные поля для даты и времени
-  let eventDate = '';
-  let eventTime = '';
+  let eventDate = "";
+  let eventTime = "";
 
   let isLoading = true;
 
   // Функция загрузки данных мероприятия
   async function fetchEventDetails() {
-    const authToken = localStorage.getItem('auth_token'); // Получение токена из локального хранилища
+    const authToken = localStorage.getItem("auth_token"); // Получение токена из локального хранилища
 
     if (!authToken) {
-      alert('Необходимо войти в систему для просмотра данных!');
+      alert("Необходимо войти в систему для просмотра данных!");
       return;
     }
 
     try {
-      const response = await fetch(`http://62.84.122.113:8000/events/${eventId}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `${authToken}` // Добавляем токен в заголовок
+      const response = await fetch(
+        `http://62.84.122.113:8000/events/${eventId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `${authToken}`, // Добавляем токен в заголовок
+          },
         }
-      });
+      );
 
       if (!response.ok) {
         throw new Error(`Ошибка загрузки данных: ${response.statusText}`);
@@ -47,23 +50,23 @@
 
       const data = await response.json();
       eventData = {
-        event_name: data.event_name || '',
-        place: data.place || '',
-        long_description: data.long_description || '',
-        short_description: data.short_description || '',
+        event_name: data.event_name || "",
+        place: data.place || "",
+        long_description: data.long_description || "",
+        short_description: data.short_description || "",
         max_count_of_members: data.max_count_of_members || 0,
-        online_event_link: data.online_event_link || '',
-        format: data.format || 'offline',
-        date: data.date || '',
-        tags: data.tags || ''
+        online_event_link: data.online_event_link || "",
+        format: data.format || "offline",
+        date: data.date || "",
+        tags: data.tags || "",
       };
 
       // Разделяем дату и время
       if (eventData.date) {
-        [eventDate, eventTime] = eventData.date.split('T');
+        [eventDate, eventTime] = eventData.date.split("T");
       }
     } catch (error) {
-      console.error('Ошибка загрузки данных мероприятия:', error);
+      console.error("Ошибка загрузки данных мероприятия:", error);
     } finally {
       isLoading = false;
     }
@@ -71,16 +74,18 @@
 
   // Загружаем данные при монтировании компонента
   onMount(() => {
-    eventId = $page.params.eventId;
-    fetchEventDetails();
+    eventId = $page.params.event_id;
+    if (eventId) {
+      fetchEventDetails();
+    }
   });
 
   // Обработчик обновления данных
   async function updateEvent() {
-    const authToken = localStorage.getItem('auth_token'); // Получение токена из локального хранилища
+    const authToken = localStorage.getItem("auth_token"); // Получение токена из локального хранилища
 
     if (!authToken) {
-      alert('Необходимо войти в систему для обновления данных!');
+      alert("Необходимо войти в систему для обновления данных!");
       return;
     }
 
@@ -88,27 +93,29 @@
     eventData.date = `${eventDate}T${eventTime}`;
 
     try {
-      const response = await fetch(`http://62.84.122.113:8000/events/${eventId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `${authToken}` // Добавляем токен в заголовок
-        },
-        body: JSON.stringify(eventData)
-      });
+      const response = await fetch(
+        `http://62.84.122.113:8000/events/${eventId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `${authToken}`, // Добавляем токен в заголовок
+          },
+          body: JSON.stringify(eventData),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`Ошибка обновления данных: ${response.statusText}`);
       }
 
-      alert('Данные успешно обновлены!');
+      alert("Данные успешно обновлены!");
     } catch (error) {
-      console.error('Ошибка обновления данных:', error);
-      alert('Не удалось обновить данные.');
+      console.error("Ошибка обновления данных:", error);
+      alert("Не удалось обновить данные.");
     }
   }
 </script>
-
 
 <Icon id="logo" />
 <div class="page-background">
@@ -120,27 +127,53 @@
     <div class="container">
       <div class="form">
         <div class="form-column">
-          <input type="text" bind:value={eventData.event_name} placeholder="Название мероприятия" />
-          <input type="text" bind:value={eventData.tags} placeholder="Теги (через пробел)" />
-          <textarea bind:value={eventData.short_description} placeholder="Короткое описание (до 150 символов)"></textarea>
-          <textarea bind:value={eventData.long_description} placeholder="Длинное описание"></textarea>
+          <input
+            type="text"
+            bind:value={eventData.event_name}
+            placeholder="Название мероприятия"
+          />
+          <input
+            type="text"
+            bind:value={eventData.tags}
+            placeholder="Теги (через пробел)"
+          />
+          <textarea
+            bind:value={eventData.short_description}
+            placeholder="Короткое описание (до 150 символов)"
+          ></textarea>
+          <textarea
+            bind:value={eventData.long_description}
+            placeholder="Длинное описание"
+          ></textarea>
 
           <div class="form-row">
             <!-- Привязка отдельных полей для даты и времени -->
             <input type="date" bind:value={eventDate} />
             <input type="time" bind:value={eventTime} />
-            <input type="text" bind:value={eventData.place} placeholder="Место" />
+            <input
+              type="text"
+              bind:value={eventData.place}
+              placeholder="Место"
+            />
           </div>
 
           <div class="form-row narrow">
-            <input type="number" bind:value={eventData.max_count_of_members} placeholder="Макс. участников" />
+            <input
+              type="number"
+              bind:value={eventData.max_count_of_members}
+              placeholder="Макс. участников"
+            />
             <select bind:value={eventData.format}>
               <option value="offline">Офлайн</option>
               <option value="online">Онлайн</option>
             </select>
           </div>
 
-          <input type="text" bind:value={eventData.online_event_link} placeholder="Ссылка на онлайн мероприятие (если нет - пробел)" />
+          <input
+            type="text"
+            bind:value={eventData.online_event_link}
+            placeholder="Ссылка на онлайн мероприятие (если нет - пробел)"
+          />
         </div>
       </div>
     </div>
@@ -151,11 +184,7 @@
   {/if}
 </div>
 
-
-
 <style>
-
-
   :global(html, body) {
     margin: 0;
     padding: 0;
@@ -176,7 +205,7 @@
 
   h1 {
     font-size: 46px;
-    font-family: 'Epilepsy Sans', sans-serif;
+    font-family: "Epilepsy Sans", sans-serif;
     color: white;
     margin-top: 90px;
     margin-bottom: 30px;
@@ -184,7 +213,7 @@
     width: 100%;
     max-width: 1200px;
     margin-right: 3%;
-    font-family: 'Press Start 2P', monospace;
+    font-family: "Press Start 2P", monospace;
   }
 
   .container {
@@ -214,7 +243,9 @@
     flex: 1;
   }
 
-  input, textarea, select {
+  input,
+  textarea,
+  select {
     background-color: #171615;
     color: white;
     border: none;
@@ -227,7 +258,9 @@
     min-height: 150px;
   }
 
-  input:focus, textarea:focus, select:focus {
+  input:focus,
+  textarea:focus,
+  select:focus {
     outline: none;
     box-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
   }
@@ -238,7 +271,8 @@
     width: 100%;
   }
 
-  .form-row input, .form-row select {
+  .form-row input,
+  .form-row select {
     flex: 1;
     width: auto;
   }
@@ -270,43 +304,43 @@
     color: black;
   }
   @media screen and (max-width: 768px) {
-        h1 {
-            font-size: 24px; /* Уменьшаем размер заголовка для мобильных */
-            text-align: center; /* Выравниваем текст по центру */
-        }
-
-        .container {
-            padding: 10px; /* Уменьшаем отступы */
-            border-radius: 20px; /* Немного меньше радиус */
-            width: 100%; /* Занимает всю ширину экрана */
-            box-shadow: none; /* Убираем тень для минимализма */
-        }
-
-        .form {
-            flex-direction: column; /* Элементы идут в столбик */
-            gap: 10px; /* Меньше промежутки */
-        }
-
-        .form-row {
-            flex-direction: column; /* Поля размещаем в столбик */
-            gap: 10px;
-        }
-
-        input,
-        textarea,
-        select {
-            font-size: 16px; /* Уменьшаем размер шрифта */
-            padding: 10px; /* Уменьшаем внутренние отступы */
-        }
-
-        .create-button-container {
-            margin-top: 10px;
-            text-align: center; /* Центрируем кнопку */
-        }
-
-        .create-button-container button {
-            width: 100%; /* Кнопка занимает всю ширину */
-            font-size: 18px; /* Чуть больше шрифт для удобства на мобильных */
-        }
+    h1 {
+      font-size: 24px; /* Уменьшаем размер заголовка для мобильных */
+      text-align: center; /* Выравниваем текст по центру */
     }
+
+    .container {
+      padding: 10px; /* Уменьшаем отступы */
+      border-radius: 20px; /* Немного меньше радиус */
+      width: 100%; /* Занимает всю ширину экрана */
+      box-shadow: none; /* Убираем тень для минимализма */
+    }
+
+    .form {
+      flex-direction: column; /* Элементы идут в столбик */
+      gap: 10px; /* Меньше промежутки */
+    }
+
+    .form-row {
+      flex-direction: column; /* Поля размещаем в столбик */
+      gap: 10px;
+    }
+
+    input,
+    textarea,
+    select {
+      font-size: 16px; /* Уменьшаем размер шрифта */
+      padding: 10px; /* Уменьшаем внутренние отступы */
+    }
+
+    .create-button-container {
+      margin-top: 10px;
+      text-align: center; /* Центрируем кнопку */
+    }
+
+    .create-button-container button {
+      width: 100%; /* Кнопка занимает всю ширину */
+      font-size: 18px; /* Чуть больше шрифт для удобства на мобильных */
+    }
+  }
 </style>
