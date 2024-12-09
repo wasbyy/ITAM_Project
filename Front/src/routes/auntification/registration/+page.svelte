@@ -1,87 +1,116 @@
 <script lang="ts">
     import { goto } from '$app/navigation'; // SvelteKit
     import Icon from '$lib/components/Icon.svelte';
+    import { BASE_URL } from '../../../config';
+
     // Поля формы
     let name: string = '';
     let email: string = '';
+    let telegram_id: string = ''; // Начинается пустым
     let password: string = '';
-    let telephone_number: number | null = null;
-    let course: number | null = null;
+    let telephone_number: string = ''; // Теперь это строка
+    let course: string = '';
     let university_group: string = '';
-    
 
-    // Состояние для уведомлений
+    // Уведомления
     let notificationMessage: string = '';
     let notificationType: 'success' | 'error' | 'info' = 'info';
 
-    // URL API
-    const BASE_URL = 'http://130.193.52.139:8000';
-
-    // Функция для отображения уведомлений
+    // Функция уведомлений
     const showNotification = (message: string, type: 'success' | 'error' | 'info') => {
         notificationMessage = message;
         notificationType = type;
-
-        // Скрыть уведомление через 3 секунды
         setTimeout(() => {
             notificationMessage = '';
         }, 3000);
     };
 
+    // Обработчик фокуса на поле Telegram
+    const handleTelegramFocus = () => {
+        if (telegram_id === '') {
+            telegram_id = '@'; // Добавляем @, если поле пустое
+        }
+    };
+
+    // Обработчик ввода в поле Telegram
+    const handleTelegramInput = (event: Event) => {
+        const input = event.target as HTMLInputElement;
+        if (!input.value.startsWith('@')) {
+            telegram_id = '@' + input.value.replace('@', ''); // Гарантируем, что @ всегда первый символ
+        } else {
+            telegram_id = input.value;
+        }
+    };
+
     // Обработчик регистрации
     const handleRegister = async () => {
-    if (name && email && password && telephone_number && course && university_group) {
+        console.log('Данные формы:', { name, email, telegram_id, password, telephone_number, course, university_group });
+
+        // Проверка обязательных полей
+        if (
+            !name ||
+            !email ||
+            !password ||
+            !telephone_number ||
+            !course ||
+            isNaN(Number(course)) || // Убедитесь, что курс — это число
+            !university_group
+        ) {
+            showNotification('Пожалуйста, заполните все обязательные поля!', 'error');
+            return;
+        }
+
+        // Проверка Telegram ID
+        if (!telegram_id || telegram_id === '@') {
+            showNotification('Telegram ID обязателен и должен быть корректным (начинаться с @ и содержать текст)!', 'error');
+            return;
+        }
+
+        // Проверка номера телефона с поддержкой символа '+'
+        const phonePattern = /^\+?[0-9]{10,15}$/; // Регулярное выражение для проверки номера телефона (с возможным знаком +)
+        if (!phonePattern.test(telephone_number)) {
+            showNotification('Номер телефона должен содержать только цифры (от 10 до 15 символов) и может начинаться с +!', 'error');
+            return;
+        }
+
+
+        // Формируем данные для отправки
         const registrationData = {
             name,
+            telegram_id,
             email,
             password,
-            telephone_number,
-            course,
+            telephone_number, // Оставляем как строку
+            course: Number(course),
             university_group,
         };
 
-        // Логируем данные перед отправкой
-        console.log('Данные для регистрации:', registrationData);
-        console.log('URL для запроса:', `${BASE_URL}/create_user`);
+        console.log('Отправка данных на сервер:', registrationData);
 
         try {
             const response = await fetch(`${BASE_URL}/create_user`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(registrationData),
             });
 
-            // Логируем объект ответа
-            console.log('Ответ от сервера (RAW):', response);
-
             if (response.ok) {
                 const result = await response.json();
-
-                // Логируем результат успешного ответа
-                console.log('Успешный ответ от сервера:', result);
+                console.log('Успешный ответ:', result);
                 showNotification('Регистрация успешна!', 'success');
-                goto('/mainpage'); // Переход на главную страницу
+                goto('/mainpage');
             } else {
-                // Логируем, если ответ не OK
                 const error = await response.json();
                 console.error('Ошибка регистрации:', error);
                 showNotification(`Ошибка: ${error.detail || 'Неизвестная ошибка'}`, 'error');
             }
         } catch (err) {
-            // Логируем ошибки сети или запроса
             console.error('Ошибка при выполнении запроса:', err);
-            showNotification('Сервер недоступен. Проверьте подключение.', 'error');
+            showNotification('Ошибка соединения с сервером.', 'error');
         }
-    } else {
-        // Логируем, если поля формы не заполнены
-        console.warn('Не все поля заполнены. Проверьте форму.');
-        showNotification('Пожалуйста, заполните все поля!', 'info');
-    }
-};
-
+    };
 </script>
+
 <style>
     /* Общий стиль для страницы */
     :global(body) {
@@ -231,24 +260,90 @@
         font-size: 1.5rem;
         cursor: pointer;
     }
+    .login-container input.error {
+        border: 2px solid red;
+        background-color: rgba(255, 0, 0, 0.1);
+    }
+    @media (max-width: 768px) {
+    /* Уменьшаем размеры контейнера и элементов */
+    .login-container {
+        margin-top: 120px;
+        width: 80%; /* Уменьшаем ширину контейнера */
+        padding: 1.5rem; /* Уменьшаем отступы внутри */
+    }
+
+    .login-container h1 {
+        font-size: 1.5rem; /* Уменьшаем размер заголовка */
+        margin-top: 0; /* Убираем лишний отступ сверху */
+        margin-bottom: 1rem; /* Уменьшаем отступ снизу */
+    }
+
+    .login-container input {
+        padding: 0.8rem; /* Уменьшаем внутренний отступ */
+        font-size: 0.9rem; /* Уменьшаем размер шрифта */
+    }
+
+    .btn {
+        padding: 0.8rem 1.2rem; /* Уменьшаем отступы на кнопке */
+        font-size: 1rem; /* Уменьшаем размер шрифта на кнопке */
+    }
+}
 </style>
 
 <Icon id="logo"/>
-
 <div class="login-container">
     <h1 class="title">Регистрация</h1>
-    <input type="text" placeholder="Имя" bind:value={name} />
-    <input type="email" placeholder="Почта" bind:value={email} />
-    <input type="password" placeholder="Пароль" bind:value={password} />
-    <input type="tel" placeholder="Номер телефона" bind:value={telephone_number} />
-    <input type="number" placeholder="Курс" bind:value={course} />
-    <input type="text" placeholder="Учебная группа" bind:value={university_group} />
+    <input
+        type="text"
+        placeholder="ФИО"
+        bind:value={name}
+        required
+    />
+    <input
+        type="email"
+        placeholder="Почта"
+        bind:value={email}
+        required
+    />
+    <input
+        type="text"
+        placeholder="Telegram"
+        bind:value={telegram_id}
+        on:focus={handleTelegramFocus} 
+        on:input={handleTelegramInput} 
+        class:error={telegram_id === '@'} 
+    />
+    <input
+        type="password"
+        placeholder="Пароль"
+        bind:value={password}
+        required
+    />
+    <input
+        type="tel"
+        placeholder="Номер телефона"
+        bind:value={telephone_number}
+        required
+        class:error={!/^\+?[0-9]{10,15}$/.test(telephone_number) && telephone_number !== ''} 
+        />
+    <input
+        type="number"
+        placeholder="Курс"
+        bind:value={course}
+        required
+    />
+    <input
+        type="text"
+        placeholder="Учебная группа"
+        bind:value={university_group}
+        required
+    />
     <button class="btn" on:click={handleRegister}>Зарегистрироваться</button>
-</div>
 
-{#if notificationMessage}
-  <div class="notification {notificationType}">
-    {notificationMessage}
-    <button on:click={() => notificationMessage = ''}>×</button>
-  </div>
-{/if}
+    {#if notificationMessage}
+        <div class="notification {notificationType}">
+            {notificationMessage}
+            <button on:click={() => notificationMessage = ''}>×</button>
+        </div>
+    {/if}
+</div>

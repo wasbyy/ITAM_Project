@@ -1,11 +1,50 @@
 <script lang="ts">
     import Icon from "$lib/components/Icon.svelte";
-    let login: string = '';
+    let username: string = '';
     let password: string = '';
-    const handleLogin = () => {
-        if (login && password) {
-            console.log('Login:', login);
-            console.log('Password:', password);
+    import { BASE_URL } from "../../../../config";
+
+    const handleLogin = async () => {
+        console.log('handleLogin called');
+
+        if (username && password) {
+            console.log('Credentials entered:', { username, password });
+
+            try {
+                // Кодируем данные в формате application/x-www-form-urlencoded
+                const requestBody = new URLSearchParams({
+                    grant_type: 'password',
+                    username: username,
+                    password: password,
+                    scope: 'read write',  // Если scope не обязательное, можно оставить пустым или убрать
+                    client_id: '',        // Добавьте client_id, если это нужно
+                    client_secret: ''     // Добавьте client_secret, если это нужно
+                }).toString();
+
+                console.log('Sending request with body:', requestBody);  // Логируем тело запроса
+
+                const response = await fetch(`${BASE_URL}/login/token`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',  // Указываем нужный заголовок
+                    },
+                    body: requestBody,  // Отправляем данные в теле запроса
+                });
+
+                console.log('Response status:', response.status); // Логируем статус ответа
+                const data = await response.json();
+                console.log('Response data:', data);
+
+                if (response.ok) {
+                    console.log('Login successful:', data);
+                    localStorage.setItem('auth_token', data.access_token);
+                    window.location.href = '/mainpage';
+                } else {
+                    console.log('Error:', data.message || 'Что-то пошло не так');
+                }
+            } catch (error) {
+                console.error('Ошибка при отправке данных:', error);
+            }
         } else {
             console.log('Заполните все поля!');
         }
@@ -135,12 +174,37 @@
         transform: scale(0.95); /* Уменьшение размера при нажатии */
         box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1); /* Уменьшенная тень */
     }
+    @media (max-width: 768px) {
+    /* Уменьшаем размеры контейнера и элементов */
+    .login-container {
+        width: 80%; /* Уменьшаем ширину контейнера */
+        padding: 1.5rem; /* Уменьшаем отступы внутри */
+    }
+
+    .login-container h1 {
+        font-size: 1.5rem; /* Уменьшаем размер заголовка */
+        margin-top: 0; /* Убираем лишний отступ сверху */
+        margin-bottom: 1rem; /* Уменьшаем отступ снизу */
+    }
+
+    .login-container input {
+        padding: 0.8rem; /* Уменьшаем внутренний отступ */
+        font-size: 0.9rem; /* Уменьшаем размер шрифта */
+    }
+
+    .btn {
+        padding: 0.8rem 1.2rem; /* Уменьшаем отступы на кнопке */
+        font-size: 1rem; /* Уменьшаем размер шрифта на кнопке */
+    }
+
+    
+}
 </style>
 
 <Icon id="logo"/>
 <div class="login-container">
     <h1 class="title">Вход</h1>
-    <input type="text" placeholder="Логин" bind:value={login} />
+    <input type="text" placeholder="Логин" bind:value={username} />
     <input type="password" placeholder="Пароль" bind:value={password} />
     <button class="btn" on:click={handleLogin}>Войти</button>
 </div>

@@ -1,24 +1,24 @@
 <script lang="ts">
   import Icon from "$lib/components/Icon.svelte";
-    const handleParticipantClick = () => {
-      const button = document.querySelector('.glow-on-hover.participant');
-      button?.classList.add('active'); // Добавляем класс
+
+  // Функция для обработки нажатия кнопок
+  const handleButtonClick = (role: "participant" | "admin") => {
+    const button = document.querySelector(`.glow-on-hover.${role}`); // Находим кнопку по классу
+    if (button) {
+      button.classList.add("active"); // Добавляем класс активности
       setTimeout(() => {
-        button?.classList.remove('active'); // Убираем через 100ms
-        window.location.href = "http://localhost:5173/authorizationUser";
-      }, 100); // Длительность эффекта должна совпадать с transition в CSS
-    };
-  
-    const handleAdminClick = () => {
-      const button = document.querySelector('.glow-on-hover.admin');
-      button?.classList.add('active'); // Добавляем класс
-      setTimeout(() => {
-        button?.classList.remove('active'); // Убираем через 100ms
-        window.location.href = "http://localhost:5173/authorizationAdm";
-      }, 100);
-    };
-  </script>
-  
+        button.classList.remove("active"); // Убираем класс через 100ms
+        // Переход на соответствующую страницу
+        const url =
+          role === "participant"
+            ? "/auntification/authorization/User"
+            : "/auntification/authorization/Admin";
+        window.location.href = url;
+      }, 100); 
+    }
+  };
+</script>
+
   <style>
     /* Общий стиль страницы */
     :global(body) {
@@ -160,14 +160,20 @@
     <div class="background"></div>
     <Icon id="logo"/>
   
-    <!-- Контейнер для кнопок -->
     <div class="buttons-container">
-      <button class="glow-on-hover participant" on:click={handleParticipantClick}>
+      <button
+        class="glow-on-hover participant"
+        on:click={() => handleButtonClick("participant")}
+      >
         <span>я участник</span>
       </button>
-      <button class="glow-on-hover admin" on:click={handleAdminClick}>
+      <button
+        class="glow-on-hover admin"
+        on:click={() => handleButtonClick("admin")}
+      >
         <span>я организатор</span>
       </button>
     </div>
+    
   </div>
   
