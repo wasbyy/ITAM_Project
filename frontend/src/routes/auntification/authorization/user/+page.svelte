@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto } from "$app/navigation"; // Импортируем функцию goto
   import Icon from "$lib/components/Icon.svelte";
+  import { setCookie } from "$lib/utils/utilCookie";
   let username: string = "";
   let password: string = "";
   import { BASE_URL } from "../../../../config";
@@ -38,7 +39,7 @@
 
         if (response.ok) {
           console.log("Login successful:", data);
-          localStorage.setItem("auth_token", data.access_token);
+          setCookie("auth_token", data.access_token);
           goto("/lk/user"); // Переход по маршруту
         } else {
           console.log("Error:", data.message || "Что-то пошло не так");

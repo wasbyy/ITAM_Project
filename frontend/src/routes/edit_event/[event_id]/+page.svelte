@@ -3,6 +3,7 @@
   import { onMount } from "svelte";
   import Icon from "$lib/components/Icon.svelte";
   import { BASE_URL } from "../../../config";
+  import { getCookie } from "$lib/utils/utilCookie";
 
   let eventId: string;
 
@@ -27,7 +28,7 @@
 
   // Функция загрузки данных мероприятия
   async function fetchEventDetails() {
-    const authToken = localStorage.getItem("auth_token");
+    const authToken = getCookie("auth_token");
 
     if (!authToken) {
       alert("Необходимо войти в систему для просмотра данных!");
@@ -76,7 +77,7 @@
   });
 
   async function updateEvent() {
-    const authToken = localStorage.getItem("auth_token");
+    const authToken = getCookie("auth_token");
     if (!authToken) {
       alert("Необходимо войти в систему для обновления данных!");
       return;
@@ -105,7 +106,7 @@
   }
 
   async function deleteEvent() {
-    const authToken = localStorage.getItem("auth_token");
+    const authToken = getCookie("auth_token");
     if (!authToken) {
       alert("Необходимо войти в систему для удаления данных!");
       return;
@@ -132,7 +133,7 @@
   }
 
   async function archiveEvent() {
-    const authToken = localStorage.getItem("auth_token");
+    const authToken = getCookie("auth_token");
     if (!authToken) {
       alert("Необходимо войти в систему для архивации данных!");
       return;

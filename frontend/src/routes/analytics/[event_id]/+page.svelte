@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import Icon from '$lib/components/Icon.svelte';
+  import { getCookie } from '$lib/utils/utilCookie';
   import { BASE_URL } from '../../../config';
 
   // Получение event_id из параметров маршрута
@@ -12,7 +13,7 @@
   // Функция для получения данных статистики мероприятия
   async function fetchStatistics(eventId: string) {
     try {
-      const token = localStorage.getItem('auth_token'); // Получаем токен из localStorage
+      const token = getCookie('auth_token'); // Получаем токен из localStorage
       if (!token) {
         throw new Error('Токен не найден, необходимо авторизоваться');
       }

@@ -1,5 +1,6 @@
 <script lang="ts">
     import Icon from "$lib/components/Icon.svelte";
+  import { getCookie } from "$lib/utils/utilCookie";
     import { BASE_URL } from "../../config";
 
     let title: string = '';
@@ -56,7 +57,7 @@
             return;
         }
 
-        const authToken: string | null = localStorage.getItem('auth_token');
+        const authToken: string | null = getCookie('auth_token');
         if (!authToken) {
             alert('Необходимо войти в систему!');
             return;

@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
   import { BASE_URL } from "../config";
   import { goto } from "$app/navigation";
+  import { getCookie } from "$lib/utils/utilCookie";
   
   interface Event {
     event_id: number;
@@ -48,7 +49,7 @@
 
   const getUserRole = async () => {
     try {
-      const token = localStorage.getItem("auth_token");
+      const token = getCookie("auth_token");
       if (!token) throw new Error("Необходима авторизация");
 
       const response = await fetch(`${BASE_URL}/user_role`, {
@@ -66,7 +67,7 @@
   };
 
   onMount(async () => {
-    isAuthenticated = !!localStorage.getItem("auth_token");
+    isAuthenticated = !!getCookie("auth_token");
     await loadEvents();
     if (isAuthenticated) await getUserRole();
   });

@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import Icon from "$lib/components/Icon.svelte";
+  import { getCookie } from "$lib/utils/utilCookie";
 
     // Определяем интерфейс для события
     interface Event {
@@ -16,7 +17,7 @@
     // Функция для загрузки завершенных мероприятий пользователя
     async function loadCompletedEvents(): Promise<void> {
         try {
-            const token = localStorage.getItem('auth_token');
+            const token = getCookie('auth_token');
             if (!token) {
                 console.error("Токен отсутствует. Пользователь не авторизован.");
                 return;

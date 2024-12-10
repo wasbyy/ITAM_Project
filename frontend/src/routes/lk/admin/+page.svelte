@@ -2,6 +2,7 @@
   import { goto } from '$app/navigation'; // Для навигации
   import { onMount } from 'svelte'; // Для загрузки данных после монтирования компонента
   import { BASE_URL } from '../../../config';
+  import { eraseCookie } from '$lib/utils/utilCookie';
   
   interface Event {
     event_id: number;
@@ -32,7 +33,7 @@
   }
 
   function logout() {
-    localStorage.removeItem('auth_token'); // Удаление токена из localStorage
+    eraseCookie('auth_token'); // Удаление токена из localStorage
     goto('/'); // Перенаправление на страницу входа
   }
 
