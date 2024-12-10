@@ -18,29 +18,25 @@
   let isRoleLoaded = false;
   let isLoading = true;
 
-  // Функция для получения изображения мероприятия
-  const fetchEventImage = async (eventId: number): Promise<string> => {
-    try {
-      const response = await fetch(`${BASE_URL}/show_event_image/${eventId}`);
-      if (!response.ok) throw new Error("Не удалось загрузить изображение");
-      const blob = await response.blob();
-      return URL.createObjectURL(blob);
-    } catch (error) {
-      console.error("Ошибка загрузки изображения:", error);
-      return "https://via.placeholder.com/400x400"; // Плейсхолдер
-    }
-  };
-
-  // Загрузка списка мероприятий
   const loadEvents = async () => {
     try {
       const response = await fetch(`${BASE_URL}/events`);
       if (!response.ok) throw new Error("Не удалось загрузить мероприятия");
       const data: Event[] = await response.json();
+
       events = await Promise.all(
         data.map(async (event) => ({
           ...event,
-          image_url: await fetchEventImage(event.event_id),
+          image_url: await (async () => {
+            try {
+              const imgResponse = await fetch(`${BASE_URL}/show_event_image/${event.event_id}`);
+              if (!imgResponse.ok) throw new Error("Не удалось загрузить изображение");
+              const blob = await imgResponse.blob();
+              return URL.createObjectURL(blob);
+            } catch {
+              return "https://via.placeholder.com/400x400"; // Плейсхолдер
+            }
+          })(),
         }))
       );
     } catch (error) {
@@ -49,10 +45,7 @@
       isLoading = false;
     }
   };
-  $: {
-    console.log(userRole);
-  }
-  // Получение роли пользователя
+
   const getUserRole = async () => {
     try {
       const token = localStorage.getItem("auth_token");
@@ -62,8 +55,7 @@
         headers: { Authorization: `${token}` },
       });
 
-      if (!response.ok)
-        throw new Error("Ошибка при получении роли пользователя");
+      if (!response.ok) throw new Error("Ошибка при получении роли пользователя");
       userRole = await response.text();
     } catch (error) {
       console.error("Ошибка получения роли:", error);
@@ -73,42 +65,10 @@
     }
   };
 
-  // Навигация в зависимости от роли
-  const navigateToByRole = (role: string) => {
-    const url =
-      role === '"admin"'
-        ? "/lk/admin"
-        : role === '"user"'
-          ? "/lk/user"
-          : "/error";
-    goto(url);
-  };
-
-  // Обработка клика на профиль
-  // const handleProfileClick = async () => {
-  //   if (!isRoleLoaded) {
-  //     console.warn("Роль пользователя еще не загружена");
-  //     return;
-  //   }
-  //   if (userRole) {
-  //     navigateToByRole(userRole);
-  //   } else {
-  //     goto("/error");
-  //   }
-  // };
-
-  // Обработка клика на карточку мероприятия
-  const handleEventClick = (eventId: number) => {
-    goto(`/event/${eventId}`);
-  };
-
-  // Загрузка данных при монтировании компонента
   onMount(async () => {
     isAuthenticated = !!localStorage.getItem("auth_token");
     await loadEvents();
-    if (isAuthenticated) {
-      await getUserRole();
-    }
+    if (isAuthenticated) await getUserRole();
   });
 </script>
 
@@ -122,14 +82,12 @@
       {#if isAuthenticated && isRoleLoaded}
         <button
           class="profile-btn"
-          on:click={() => navigateToByRole(userRole ? userRole : "")}
-          >Профиль</button
+          on:click={() => goto(userRole === '"admin"' ? "/lk/admin" : userRole === '"user"' ? "/lk/user" : "/error")}
         >
+          Профиль
+        </button>
       {:else}
-        <button
-          class="login-btn"
-          on:click={() => goto("/auntification/selectrole")}>Вход</button
-        >
+        <button class="login-btn" on:click={() => goto("/auntification/selectrole")}>Вход</button>
       {/if}
     </div>
     <h1 class="title">Мероприятия</h1>
@@ -143,12 +101,7 @@
     {:else}
       <div class="event-cards">
         {#each events as event (event.event_id)}
-          <!-- svelte-ignore a11y_click_events_have_key_events -->
-          <!-- svelte-ignore a11y_no_static_element_interactions -->
-          <div
-            class="event-card"
-            on:click={() => handleEventClick(event.event_id)}
-          >
+          <div class="event-card" on:click={() => goto(`/event/${event.event_id}`)}>
             <img src={event.image_url} alt="Фото мероприятия" />
             <div class="info">
               <h3>{event.event_name}</h3>
@@ -171,6 +124,7 @@
   </div>
 </div>
 
+
 <style>
   /* Стили для глобальных элементов страницы */
     :global(body) {
@@ -186,7 +140,7 @@
   }
   /* Контейнер для главной страницы */
   .container { /* Контейнер позиционируется относительно родителя */
-    height: 90vh; /* Высота контейнера — 100% от высоты экрана */
+    height: 100vh; /* Высота контейнера — 100% от высоты экрана */
     width: 100vw; /* Ширина контейнера — 100% от ширины экрана */
     display: flex; /* Используем flexbox для удобного выравнивания */
     flex-direction: column; /* Элементы внутри контейнера выстраиваются по вертикали */
@@ -204,7 +158,8 @@
     left: 0; /* Прикрепляем к левой части */
     width: 100%; /* Задаем ширину на весь экран */
     height: 100%; /* Задаем высоту на весь экран */
-    background: url("/background.png") no-repeat center center / cover; /* Загружаем фоновое изображение */
+    background: url("/background.png");
+    background-size: cover;
     filter: brightness(1.1); /* Немного увеличиваем яркость фона */
     z-index: -1; /* Фон будет находиться позади всех остальных элементов */
   }
@@ -295,11 +250,11 @@
   /* Стиль для "страницы" мероприятий */
   .gray-background {
     width: 100%; /* Задаем ширину 100% */
-    background: #171615; /* Цвет фона страницы */
     display: flex; /* Используем flexbox для выравнивания */
     justify-content: center; /* Центрируем содержимое по горизонтали */
     background-image: url(/backgroundBottom.png);
     background-size: cover;
+    
   }
 
   /* Контейнер для карточек мероприятий */
@@ -314,53 +269,27 @@
 
   /* Стиль для каждой карточки мероприятия */
   .event-card {
-    background: #252525; /* Темный фон для карточки */
-    border-radius: 30px; /* Скругленные углы */
-    display: flex; /* Используем flexbox внутри карточки */
-    flex-direction: row; /* Изображение слева, информация справа */
-    padding: 20px; /* Отступы внутри карточки */
-    color: white; /* Белый цвет текста */
-    position: relative; /* Для размещения градиентной рамки */
-    overflow: hidden; /* Прячем содержимое, выходящее за границы */
-    z-index: 1; /* Поверх градиента */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); /* Легкая тень */
-    transition: transform 0.2s ease-in-out; /* Плавный переход для трансформации */
-  }
+  background: rgba(37, 37, 37, 0.6); /* Уменьшаем прозрачность */
+  border-radius: 30px; /* Скругленные углы */
+  display: flex; /* Используем flexbox внутри карточки */
+  flex-direction: row; /* Изображение слева, информация справа */
+  padding: 20px; /* Отступы внутри карточки */
+  color: white; /* Белый цвет текста */
+  position: relative; /* Для размещения градиентной рамки */
+  overflow: hidden; /* Прячем содержимое, выходящее за границы */
+  z-index: 1; /* Поверх градиента */
+  transition: transform 0.2s ease-in-out, background 0.3s ease; /* Плавный переход для трансформации и фона */
+  border: #838383 solid 1px;
+  backdrop-filter: blur(10px); /* Размытие заднего фона */
+}
 
-  .event-card:hover {
-    transform: scale(1.03); /* Увеличиваем карточку на 5% при наведении */
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6); /* Увеличиваем тень при наведении */
-  }
+.event-card:hover {
+  transform: scale(1.03); /* Увеличиваем карточку на 5% при наведении */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6); /* Увеличиваем тень при наведении */
+}
 
-  /* Градиентная рамка */
-  .event-card::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(
-      135deg,
-      rgba(255, 165, 0, 0.7),
-      rgba(255, 99, 71, 0.7),
-      rgba(255, 69, 0, 0.7),
-      rgba(255, 165, 0, 0.7)
-    ); /* Оранжево-красный градиент */
-    background-size: 300% 300%; /* Размер фона для анимации */
-    border-radius: 30px; /* Совпадает с радиусом карточки */
-    padding: 3px; /* Толщина обводки */
-    -webkit-mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0); /* Маска для создания рамки */
-    mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    -webkit-mask-composite: exclude; /* Для удаления внутреннего содержимого */
-    mask-composite: exclude;
-    z-index: -1; /* Помещаем за карточкой */
-    animation: circularGradient 15s linear infinite; /* Анимация движения */
-  }
+
+
 
   /* Анимация кругового движения градиента */
   @keyframes circularGradient {

@@ -8,37 +8,46 @@
         title: string; // Название события
         image: string; // URL изображения
         date: string; // Дата события
-        description: string; // Краткое описание
-        place: string; // Место проведения
-        tags: string[]; // Теги события
     }
 
     // Типизируем массив мероприятий
     let events: Event[] = [];
 
-    // Функция для загрузки данных с сервера
-    async function loadArchivedEvents(): Promise<void> {
+    // Функция для загрузки завершенных мероприятий пользователя
+    async function loadCompletedEvents(): Promise<void> {
         try {
-            const response = await fetch('/archived_events');
+            const token = localStorage.getItem('auth_token');
+            if (!token) {
+                console.error("Токен отсутствует. Пользователь не авторизован.");
+                return;
+            }
+
+            // Получаем user_id из токена или другого хранилища
+            const userId = token; // Пример использования токена в качестве user_id
+            const response = await fetch(`/user_completed_events/${userId}`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${token}`, // Заголовок авторизации
+                    "Content-Type": "application/json",
+                },
+            });
+
             if (response.ok) {
                 const data: Array<{
                     event_id: number;
                     event_name: string;
                     date: string;
-                    short_description: string;
-                    place: string;
-                    tags: string[];
                 }> = await response.json();
 
                 // Преобразуем данные в формат, который ожидается для отображения
                 events = data.map(event => ({
                     id: event.event_id,
                     title: event.event_name,
-                    image: "https://via.placeholder.com/150", // Если есть изображение в данных, его можно заменить
-                    date: event.date,
-                    description: event.short_description,
-                    place: event.place,
-                    tags: event.tags
+                    image: "https://via.placeholder.com/150", // Если есть изображение, можно заменить
+                    date: new Date(event.date).toLocaleDateString(), // Форматируем дату
+                    description: "", // Поскольку данные не содержат описания, оставляем пустую строку
+                    place: "", // Место проведения оставляем пустым
+                    tags: [] // Теги оставляем пустым массивом
                 }));
             } else {
                 console.error("Ошибка при получении данных:", response.status);
@@ -48,9 +57,9 @@
         }
     }
 
-    // Загружаем события при монтировании компонента
+    // Загружаем завершенные события при монтировании компонента
     onMount(() => {
-        loadArchivedEvents();
+        loadCompletedEvents();
     });
 </script>
 
@@ -120,19 +129,24 @@
         color: white;
         text-align: center;
     }
+
+    .card-description {
+        color: white;
+        text-align: center;
+    }
 </style>
 
 <Icon id="logo" left={false}/>
 <div class="background-container"></div>
 
 <div class="container">
-    <h1>Архивные мероприятия</h1>
+    <h1>Завершенные мероприятия</h1>
     <div class="grid">
         {#each events as event}
             <div class="card">
                 <img src={event.image} alt={event.title} />
                 <div class="card-title">{event.title}</div>
-                <div class="card-description">{event.description}</div>
+                <div class="card-date">{event.date}</div>
             </div>
         {/each}
     </div>

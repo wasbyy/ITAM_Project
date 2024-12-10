@@ -1,81 +1,65 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-    import { goto } from "$app/navigation";
-    import { BASE_URL } from "../../../config";
 
-    // Тип для описания структуры события
-    type Event = {
-        id: number;
-        event_name: string;
-        date: string; // Дата в строковом формате (ISO)
-    };
+import { onMount } from "svelte";
+import { goto } from "$app/navigation";
+import { BASE_URL } from "../../../config";
 
-    let events: Event[] = []; // Массив мероприятий пользователя
-    let loading: boolean = true; // Индикатор загрузки данных
-    let error: string | null = null; // Для отображения ошибок
-    let userId: string | null; // ID пользователя
+type Event = {
+    event_id: number;
+    event_name: string;
+    date: string;
+};
 
-    // Функция загрузки мероприятий пользователя
-    async function loadUserEvents(): Promise<void> {
-        try {
-            const token = localStorage.getItem('auth_token'); // Получаем токен из локального хранилища
-            userId = token; // Можно установить userId как токен, если оно используется для аутентификации
+let events: Event[] = [];
+let loading = true;
+let error: string | null = null;
 
-            if (!token) {
-                throw new Error("Пользователь не авторизован. Токен отсутствует.");
-            }
+const authToken = localStorage.getItem('auth_token');
 
-            const response = await fetch(`${BASE_URL}/user_events/${userId}`, {
-                method: "GET",
-                headers: {
-                    Authorization: `${token}`, // Добавляем токен в заголовок
-                    "Content-Type": "application/json" // Указываем тип содержимого
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`Ошибка загрузки: ${response.status}`);
-            }
-
-            events = await response.json() as Event[]; // Явно указываем ожидаемый тип ответа
-        } catch (err: unknown) {
-            error = (err instanceof Error) ? err.message : "Неизвестная ошибка";
-        } finally {
-            loading = false; // Завершаем процесс загрузки
-        }
+async function loadUserEvents(): Promise<void> {
+    if (!authToken) {
+        error = "Пользователь не авторизован. Токен отсутствует.";
+        loading = false;
+        return;
     }
 
-    // Выполняем запрос при монтировании компонента
-    onMount(() => {
-        loadUserEvents();
-    });
+    try {
+        const response = await fetch(`${BASE_URL}/user_events`, {
+            method: "GET",
+            headers: {
+                Authorization: authToken,
+                "Content-Type": "application/json",
+            },
+        });
 
-    // Функция отображения времени мероприятия
-    function viewTime(event: Event): void {
-        alert(`Время мероприятия: ${new Date(event.date).toLocaleTimeString()}`);
+        if (!response.ok) throw new Error(`Ошибка загрузки: ${response.status}`);
+        events = await response.json() as Event[];
+    } catch (err) {
+        error = err instanceof Error ? err.message : "Неизвестная ошибка";
+    } finally {
+        loading = false;
     }
+}
 
-    // Функция отображения даты мероприятия
-    function viewDate(event: Event): void {
-        alert(`Дата мероприятия: ${new Date(event.date).toLocaleDateString()}`);
-    }
+function viewEventDetail(event: Event, type: "date" | "time"): void {
+    const date = new Date(event.date);
+    const message = type === "time"
+        ? `Время мероприятия: ${date.toLocaleTimeString()}`
+        : `Дата мероприятия: ${date.toLocaleDateString()}`;
+    alert(message);
+}
 
-    // Функция выхода
-    function logout(): void {
-        localStorage.removeItem('auth_token');
-        goto('/'); // Перенаправление на главную страницу
-    }
+function logout(): void {
+    localStorage.removeItem('auth_token');
+    goto('/');
+}
 
-    // Функция перехода к архиву
-    function goToArchive(): void {
-        const token = localStorage.getItem('auth_token');
-        if (token) {
-            // Направляем на страницу с архивом, где {token} используется как параметр URL
-            goto(`/archieve/user/${token}`);
-        } else {
-            console.error("Токен не найден");
-        }
-    }
+function goToArchive(): void {
+    if (authToken) goto(`/archieve/user/`);
+    else console.error("Токен не найден");
+}
+
+onMount(loadUserEvents);
 </script>
 
 <div class="container">
@@ -138,8 +122,16 @@
 </div>
 
 
-
 <style>/* Глобальные стили для всей страницы */
+    :global(html, body) {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    height: 100%;
+    background-color: #171615; /* Черный фон для всей страницы */
+    color: white;
+    font-family: "Inter", sans-serif;
+  }
 
     
     .container {
@@ -224,6 +216,7 @@
         align-items: center;
         width: 92%; /* Общая ширина */
         margin-bottom: 15px;
+        
     }
     
     .events-header h2 {
