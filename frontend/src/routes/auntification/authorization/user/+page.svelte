@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { goto } from "$app/navigation";
+  import { goto } from "$app/navigation"; // Импортируем функцию goto
   import Icon from "$lib/components/Icon.svelte";
   let username: string = "";
   let password: string = "";
@@ -39,7 +39,7 @@
         if (response.ok) {
           console.log("Login successful:", data);
           localStorage.setItem("auth_token", data.access_token);
-          goto("/lk/user");
+          goto("/lk/user"); // Переход по маршруту
         } else {
           console.log("Error:", data.message || "Что-то пошло не так");
         }
@@ -49,6 +49,11 @@
     } else {
       console.log("Заполните все поля!");
     }
+  };
+
+  // Обработчик для перехода на страницу регистрации
+  const goToRegistration = () => {
+    goto("/auntification/registration"); // Переход по маршруту
   };
 </script>
 
@@ -60,10 +65,10 @@
     <input type="text" placeholder="Логин" bind:value={username} />
     <input type="password" placeholder="Пароль" bind:value={password} />
     <button class="btn" on:click={handleLogin}>Войти</button>
-    <a href="http://localhost:5173/auntification/registration">
-      <p class="register-text">Зарегистрироваться</p>
-    </a>
-  </div>
+    <button class="register-text" on:click={goToRegistration}>
+      Зарегистрироваться
+    </button>
+      </div>
 </div>
 
 <style>
@@ -149,7 +154,7 @@
 
   .btn {
     position: relative;
-    background: linear-gradient(45deg, #00ff99, #1db954, #2ecc71, #00ff00);
+    background: linear-gradient(45deg, #00ff99, #1db954, #2ecc71, #00ff00dc);
     background-size: 300% 300%;
     padding: 1rem 1.5rem;
     color: white;
@@ -157,7 +162,7 @@
     font-size: 1.1rem;
     border: none;
     width: 50%;
-    animation: buttonGradient 2s linear infinite;
+    animation: buttonGradient 3s linear infinite;
     transition: all 0.3s ease;
     font-weight: 100;
     font-size: 20px;
@@ -198,6 +203,23 @@
   .register-text:hover {
     color: #00ff99;
   }
+  .register-text {
+  background: none; /* Убирает фоновый цвет */
+  border: none; /* Убирает границы */
+  color: inherit; /* Наследует цвет текста от родителя */
+  font: inherit; /* Наследует шрифт от родителя */
+  cursor: pointer; /* Указывает, что элемент кликабельный */
+  padding: 0; /* Убирает внутренние отступы */
+  color: #2ecc71;
+}
+
+.register-text:hover {
+  text-decoration: none; /* Убирает подчёркивание при наведении */
+}
+
+.register-text:focus {
+  outline: none; /* Убирает стандартный контур при фокусе */
+}
 
   @media (max-width: 768px) {
     /* Уменьшаем размеры контейнера и элементов */

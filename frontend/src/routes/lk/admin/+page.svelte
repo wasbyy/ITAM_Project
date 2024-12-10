@@ -41,6 +41,8 @@
   });
 </script>
 
+<div class="app-container">
+
 <div class="container">
   <a href="/">
     <img src="/itam_logo.png" alt="Логотип" class="logo" />
@@ -77,17 +79,19 @@
     {/each}
   </div>
 </div>
+</div>
 
 <style>/* Глобальные стили для всей страницы */
-  :global(html, body) {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    height: 100%;
-    background-color: #171615; /* Черный фон для всей страницы */
-    color: white;
-    font-family: "Inter", sans-serif;
-  }
+.app-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        height: 100%;
+        padding: 20px;
+        background-color: #171615; /* Черный фон для всей страницы */
+        color: white;
+        font-family: "Inter", sans-serif;
+    }
   
   .container {
     display: flex;

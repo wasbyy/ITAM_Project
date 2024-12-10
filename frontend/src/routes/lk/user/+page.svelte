@@ -1,72 +1,59 @@
 <script lang="ts">
-
-import { onMount } from "svelte";
-import { goto } from "$app/navigation";
-import { BASE_URL } from "../../../config";
-
-type Event = {
-    event_id: number;
-    event_name: string;
-    date: string;
-};
-
-let events: Event[] = [];
-let loading = true;
-let error: string | null = null;
-
-const authToken = localStorage.getItem('auth_token');
-
-async function loadUserEvents(): Promise<void> {
-    if (!authToken) {
-        error = "Пользователь не авторизован. Токен отсутствует.";
-        loading = false;
-        return;
+    import { onMount } from "svelte";
+    import { goto } from "$app/navigation";
+    import { BASE_URL } from "../../../config";
+  import Icon from "$lib/components/Icon.svelte";
+    
+    type Event = {
+        event_id: number;
+        event_name: string;
+        date: string;
+    };
+    
+    let events: Event[] = [];
+    let loading = true;
+    let error: string | null = null;
+    
+    const authToken = localStorage.getItem('auth_token');
+    
+    async function loadUserEvents() {
+        try {
+            const response = await fetch(`${BASE_URL}/user_events`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `${authToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            if (!response.ok) {
+                throw new Error('Ошибка при загрузке мероприятий');
+            }
+            const data: Event[] = await response.json();
+            events = data;
+        } catch (err) {
+            error = err instanceof Error ? err.message : 'Неизвестная ошибка';
+        } finally {
+            loading = false;
+        }
     }
-
-    try {
-        const response = await fetch(`${BASE_URL}/user_events`, {
-            method: "GET",
-            headers: {
-                Authorization: authToken,
-                "Content-Type": "application/json",
-            },
-        });
-
-        if (!response.ok) throw new Error(`Ошибка загрузки: ${response.status}`);
-        events = await response.json() as Event[];
-    } catch (err) {
-        error = err instanceof Error ? err.message : "Неизвестная ошибка";
-    } finally {
-        loading = false;
+    
+    function logout(): void {
+        localStorage.removeItem('auth_token');
+        goto('/');
     }
-}
-
-function viewEventDetail(event: Event, type: "date" | "time"): void {
-    const date = new Date(event.date);
-    const message = type === "time"
-        ? `Время мероприятия: ${date.toLocaleTimeString()}`
-        : `Дата мероприятия: ${date.toLocaleDateString()}`;
-    alert(message);
-}
-
-function logout(): void {
-    localStorage.removeItem('auth_token');
-    goto('/');
-}
-
-function goToArchive(): void {
-    if (authToken) goto(`/archieve/user/`);
-    else console.error("Токен не найден");
-}
-
-onMount(loadUserEvents);
+    
+    function goToArchive(): void {
+        if (authToken) goto(`/archieve/user/`);
+        else console.error("Токен не найден");
+    }
+    
+    // Загрузка мероприятий при монтировании компонента
+    onMount(loadUserEvents);
 </script>
 
+
+<Icon id="logo" left={false} />
 <div class="container">
-    <!-- Логотип -->
-    <a href="http://localhost:5173/">
-        <img src="/itam_logo.png" alt="Логотип" class="logo" />
-    </a>
 
     <!-- Header -->
     <div class="header">
@@ -112,8 +99,11 @@ onMount(loadUserEvents);
                     <div class="event-name">{event.event_name}</div>
                 </div>
                 <div class="buttons">
-                    <button class="time-btn" on:click={() => viewTime(event)}>Время</button>
-                    <button class="date-btn" on:click={() => viewDate(event)}>Дата</button>
+                    <div class="buttons">
+                        <button class="time-btn">Время</button>
+                        <button class="date-btn">Дата</button>
+                    </div>
+                    
                 </div>
             </div>
             {/each}
@@ -298,16 +288,6 @@ onMount(loadUserEvents);
         background: rgba(52, 152, 219, 0.1);
     }
     
-    .logo {
-        position:absolute;
-        top: 50px;
-        right: 80px;
-        width: 100px; /* Размер логотипа */
-        height: auto;
-        cursor: pointer;
-        z-index: 1000; /* Поверх всего контента */
-    }
-    
     /* Стиль для нового раздела "Данные" */
     .data-section {
         margin-left: 4%;
@@ -432,13 +412,6 @@ onMount(loadUserEvents);
     .archive-btn {
         font-size: 18px;
         padding: 8px 20px;
-    }
-
-    /* Логотип также уменьшаем */
-    .logo {
-        width: 80px;
-        top: 20px;
-        right: 10px;
     }
 
     /* Изменения для контейнера и основного блока */

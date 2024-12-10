@@ -2,7 +2,7 @@
   import { onMount } from "svelte";
   import { BASE_URL } from "../config";
   import { goto } from "$app/navigation";
-
+  
   interface Event {
     event_id: number;
     event_name: string;
@@ -34,7 +34,7 @@
               const blob = await imgResponse.blob();
               return URL.createObjectURL(blob);
             } catch {
-              return "https://via.placeholder.com/400x400"; // Плейсхолдер
+              return "https://avatars.mds.yandex.net/i?id=166c32386ec148d145f75f850da055e2298d59d7-12472594-images-thumbs&n=13"; // Плейсхолдер
             }
           })(),
         }))
@@ -101,6 +101,8 @@
     {:else}
       <div class="event-cards">
         {#each events as event (event.event_id)}
+          <!-- svelte-ignore a11y_click_events_have_key_events -->
+          <!-- svelte-ignore a11y_no_static_element_interactions -->
           <div class="event-card" on:click={() => goto(`/event/${event.event_id}`)}>
             <img src={event.image_url} alt="Фото мероприятия" />
             <div class="info">
@@ -126,14 +128,7 @@
 
 
 <style>
-  /* Стили для глобальных элементов страницы */
-    :global(body) {
-      margin: 0; /* Убираем отступы */
-      padding: 0; /* Убираем внутренние отступы */
-      background: #171615; /* Цвет фона страницы */
-      overflow-x: hidden; /* Отключаем горизонтальную прокрутку */
-      font-family: "Inter", sans-serif; /* Устанавливаем шрифт для страницы */
-    }
+
   .page{
     display: flex;
     flex-direction: column;
@@ -161,7 +156,7 @@
     background: url("/background.png");
     background-size: cover;
     filter: brightness(1.1); /* Немного увеличиваем яркость фона */
-    z-index: -1; /* Фон будет находиться позади всех остальных элементов */
+    z-index: 0; /* Фон будет находиться позади всех остальных элементов */
   }
 
   /* Панель сверху страницы с логотипом и кнопкой "Вход" */

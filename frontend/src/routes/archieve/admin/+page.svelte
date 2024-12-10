@@ -29,7 +29,7 @@
             // Ассоциируем изображения с мероприятиями
             events = data.map((event, index) => ({
                 ...event,
-                image: images[index] || "https://via.placeholder.com/150",
+                image: images[index] || "https://avatars.mds.yandex.net/i?id=166c32386ec148d145f75f850da055e2298d59d7-12472594-images-thumbs&n=13",
             }));
         } else {
             console.error("Ошибка при получении данных:", response.status);
@@ -115,6 +115,9 @@
         transition: transform 0.3s ease;
         padding: 10px;
         width: 250px;
+        text-decoration: none; /* Убирает подчеркивание */
+        display: block; /* Чтобы вся карточка была кликабельной */
+
     }
 
     .card:hover {
@@ -134,13 +137,6 @@
         font-size: 28px;
         color: white;
         text-align: center;
-    }
-
-    .card-description {
-        font-size: 14px;
-        color: #ccc;
-        text-align: center;
-        margin-bottom: 20px;
     }
 
     .loading-message {
@@ -165,11 +161,12 @@
         <h1>Архивные мероприятия</h1>
         <div class="grid">
             {#each events as event}
-                <div class="card" on:click={() => navigateToEvent(event.event_id)}>
-                    <img src={event.image} alt={event.event_name} />
-                    <div class="card-title">{event.event_name}</div>
-                </div>
-            {/each}
+            <a href={`/archive_event/${event.event_id}`} class="card">
+                <img src={event.image} alt={event.event_name} />
+                <div class="card-title">{event.event_name}</div>
+            </a>
+        {/each}
+        
         </div>
     {/if}
 </div>

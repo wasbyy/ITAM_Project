@@ -73,7 +73,6 @@
             return;
         }
 
-
         // Формируем данные для отправки
         const registrationData = {
             name,
@@ -112,19 +111,20 @@
 </script>
 
 <style>
-    /* Общий стиль для страницы */
-    :global(body) {
-        margin: 0;
-        padding: 0;
-        font-family: "Inter", sans-serif;
-        background-color: #1e1d1c;
-        color: white;
+    .page-container {
         display: flex;
         justify-content: center;
         align-items: center;
         height: 100vh;
+        background-color: #1e1d1c;
     }
-
+        .border-container {
+        position: relative;
+        padding: 3px; /* Отступ для обводки */
+        background: linear-gradient(135deg, #00ff00, #1db954, #00ff99, #2ecc71);
+        border-radius: 20px; /* Радиус скругления обводки */
+        z-index: 0; /* Убедитесь, что обводка будет под основной панелью */
+    }
     .login-container {
         position: relative;
         background: #1a1a1a;
@@ -138,20 +138,7 @@
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
     }
 
-    /* Градиентная обводка */
-    .login-container::before {
-        content: '';
-        position: absolute;
-        top: -3px;
-        left: -3px;
-        right: -3px;
-        bottom: -3px;
-        background: linear-gradient(135deg, #00ff00, #1db954, #00ff99, #2ecc71);
-        background-size: 300% 300%;
-        border-radius: 23px;
-        z-index: -1;
-        animation: greenGradient 3s ease infinite;
-    }
+
 
     @keyframes greenGradient {
         0% { background-position: 0% 50%; }
@@ -260,90 +247,95 @@
         font-size: 1.5rem;
         cursor: pointer;
     }
+
     .login-container input.error {
         border: 2px solid red;
         background-color: rgba(255, 0, 0, 0.1);
     }
+
     @media (max-width: 768px) {
-    /* Уменьшаем размеры контейнера и элементов */
-    .login-container {
-        margin-top: 120px;
-        width: 80%; /* Уменьшаем ширину контейнера */
-        padding: 1.5rem; /* Уменьшаем отступы внутри */
-    }
+        .login-container {
+            margin-top: 120px;
+            width: 80%;
+            padding: 1.5rem;
+        }
 
-    .login-container h1 {
-        font-size: 1.5rem; /* Уменьшаем размер заголовка */
-        margin-top: 0; /* Убираем лишний отступ сверху */
-        margin-bottom: 1rem; /* Уменьшаем отступ снизу */
-    }
+        .login-container h1 {
+            font-size: 1.5rem;
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
 
-    .login-container input {
-        padding: 0.8rem; /* Уменьшаем внутренний отступ */
-        font-size: 0.9rem; /* Уменьшаем размер шрифта */
-    }
+        .login-container input {
+            padding: 0.8rem;
+            font-size: 0.9rem;
+        }
 
-    .btn {
-        padding: 0.8rem 1.2rem; /* Уменьшаем отступы на кнопке */
-        font-size: 1rem; /* Уменьшаем размер шрифта на кнопке */
+        .btn {
+            padding: 0.8rem 1.2rem;
+            font-size: 1rem;
+        }
     }
-}
 </style>
 
 <Icon id="logo"/>
-<div class="login-container">
-    <h1 class="title">Регистрация</h1>
-    <input
-        type="text"
-        placeholder="ФИО"
-        bind:value={name}
-        required
-    />
-    <input
-        type="email"
-        placeholder="Почта"
-        bind:value={email}
-        required
-    />
-    <input
-        type="text"
-        placeholder="Telegram"
-        bind:value={telegram_id}
-        on:focus={handleTelegramFocus} 
-        on:input={handleTelegramInput} 
-        class:error={telegram_id === '@'} 
-    />
-    <input
-        type="password"
-        placeholder="Пароль"
-        bind:value={password}
-        required
-    />
-    <input
-        type="tel"
-        placeholder="Номер телефона"
-        bind:value={telephone_number}
-        required
-        class:error={!/^\+?[0-9]{10,15}$/.test(telephone_number) && telephone_number !== ''} 
+<div class="page-container">
+    <div class="border-container">
+        <div class="login-container">
+        <h1 class="title">Регистрация</h1>
+        <input
+            type="text"
+            placeholder="ФИО"
+            bind:value={name}
+            required
         />
-    <input
-        type="number"
-        placeholder="Курс"
-        bind:value={course}
-        required
-    />
-    <input
-        type="text"
-        placeholder="Учебная группа"
-        bind:value={university_group}
-        required
-    />
-    <button class="btn" on:click={handleRegister}>Зарегистрироваться</button>
+        <input
+            type="email"
+            placeholder="Почта"
+            bind:value={email}
+            required
+        />
+        <input
+            type="text"
+            placeholder="Telegram"
+            bind:value={telegram_id}
+            on:focus={handleTelegramFocus} 
+            on:input={handleTelegramInput} 
+            class:error={telegram_id === '@'} 
+        />
+        <input
+            type="password"
+            placeholder="Пароль"
+            bind:value={password}
+            required
+        />
+        <input
+            type="tel"
+            placeholder="Номер телефона"
+            bind:value={telephone_number}
+            required
+            class:error={!/^\+?[0-9]{10,15}$/.test(telephone_number) && telephone_number !== ''} 
+        />
+        <input
+            type="number"
+            placeholder="Курс"
+            bind:value={course}
+            required
+        />
+        <input
+            type="text"
+            placeholder="Учебная группа"
+            bind:value={university_group}
+            required
+        />
+        <button class="btn" on:click={handleRegister}>Зарегистрироваться</button>
 
-    {#if notificationMessage}
-        <div class="notification {notificationType}">
-            {notificationMessage}
-            <button on:click={() => notificationMessage = ''}>×</button>
+        {#if notificationMessage}
+            <div class="notification {notificationType}">
+                {notificationMessage}
+                <button on:click={() => notificationMessage = ''}>×</button>
+            </div>
+        {/if}
         </div>
-    {/if}
+    </div>
 </div>

@@ -217,13 +217,6 @@
 </div>
 
 <style>
-  :global(html, body) {
-    margin: 0;
-    padding: 0;
-    background-color: #171615;
-    height: 100%;
-  }
-
   .page-background {
     background-color: #171615;
     width: 100vw;

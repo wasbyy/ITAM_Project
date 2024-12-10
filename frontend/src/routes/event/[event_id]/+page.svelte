@@ -261,7 +261,8 @@
 
 
 
-<style>.page-background {
+<style>
+.page-background {
     background-color: #171615;
     background-image: url('/eventbackground.png');
     background-size: cover;
