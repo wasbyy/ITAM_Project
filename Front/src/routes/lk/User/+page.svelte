@@ -1,37 +1,146 @@
 <script lang="ts">
-    let events = [
-        { id: 1, name: "Мероприятие 1", time: "12:30", date: "2024-12-05" },
-        { id: 2, name: "Мероприятие 2", time: "14:00", date: "2024-12-06" },
-        { id: 3, name: "Мероприятие 3", time: "16:15", date: "2024-12-07" },
-        { id: 4, name: "Мероприятие 4", time: "18:45", date: "2024-12-08" },
-    ];
+    import { onMount } from "svelte";
+    import { goto } from "$app/navigation";
+    import { BASE_URL } from "../../../config";
 
-    function viewTime(eventId: number) {
-        const event = events.find(e => e.id === eventId);
-        if (event) {
-            alert(`Время мероприятия: ${event.time}`);
+    // Тип для описания структуры события
+    type Event = {
+        id: number;
+        event_name: string;
+        date: string; // Дата в строковом формате (ISO)
+    };
+
+    let events: Event[] = []; // Массив мероприятий пользователя
+    let loading: boolean = true; // Индикатор загрузки данных
+    let error: string | null = null; // Для отображения ошибок
+    let userId: string | null; // ID пользователя
+
+    // Функция загрузки мероприятий пользователя
+    async function loadUserEvents(): Promise<void> {
+        try {
+            const token = localStorage.getItem('auth_token'); // Получаем токен из локального хранилища
+            userId = token; // Можно установить userId как токен, если оно используется для аутентификации
+
+            if (!token) {
+                throw new Error("Пользователь не авторизован. Токен отсутствует.");
+            }
+
+            const response = await fetch(`${BASE_URL}/user_events/${userId}`, {
+                method: "GET",
+                headers: {
+                    Authorization: `${token}`, // Добавляем токен в заголовок
+                    "Content-Type": "application/json" // Указываем тип содержимого
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`Ошибка загрузки: ${response.status}`);
+            }
+
+            events = await response.json() as Event[]; // Явно указываем ожидаемый тип ответа
+        } catch (err: unknown) {
+            error = (err instanceof Error) ? err.message : "Неизвестная ошибка";
+        } finally {
+            loading = false; // Завершаем процесс загрузки
         }
     }
 
-    function viewDate(eventId: number) {
-        const event = events.find(e => e.id === eventId);
-        if (event) {
-            alert(`Дата мероприятия: ${event.date}`);
+    // Выполняем запрос при монтировании компонента
+    onMount(() => {
+        loadUserEvents();
+    });
+
+    // Функция отображения времени мероприятия
+    function viewTime(event: Event): void {
+        alert(`Время мероприятия: ${new Date(event.date).toLocaleTimeString()}`);
+    }
+
+    // Функция отображения даты мероприятия
+    function viewDate(event: Event): void {
+        alert(`Дата мероприятия: ${new Date(event.date).toLocaleDateString()}`);
+    }
+
+    // Функция выхода
+    function logout(): void {
+        localStorage.removeItem('auth_token');
+        goto('/'); // Перенаправление на главную страницу
+    }
+
+    // Функция перехода к архиву
+    function goToArchive(): void {
+        const token = localStorage.getItem('auth_token');
+        if (token) {
+            // Направляем на страницу с архивом, где {token} используется как параметр URL
+            goto(`/archieve/user/${token}`);
+        } else {
+            console.error("Токен не найден");
         }
     }
 </script>
 
+<div class="container">
+    <!-- Логотип -->
+    <a href="http://localhost:5173/">
+        <img src="/itam_logo.png" alt="Логотип" class="logo" />
+    </a>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="profile-container">
+            <div class="profile-glow"></div>
+            <div class="profile-image"></div>
+        </div>
+        <div>
+            <div class="title">Имя Пользователя</div>
+            <div class="subtitle">Почта</div>
+        </div>
+        <!-- Кнопка выхода -->
+        <button class="logout-btn" on:click={logout}>Выйти</button>
+    </div>
+
+    <!-- Новый раздел "Данные" -->
+    <div class="data-section">
+        <h2>Данные</h2>
+        <div class="data-panels">
+            <div class="data-panel">+7 (xxx) xxx-xx-xx</div>
+            <div class="data-panel">pochtapolizov@pochta.com</div>
+            <div class="data-panel">N курс БХХХ - N - N</div>
+        </div>
+    </div>
+
+    <!-- Events Section -->
+    <div class="events-list">
+        <div class="events-header">
+            <h2>МЕРОПРИЯТИЯ</h2>
+            <button class="archive-btn" on:click={goToArchive}>АРХИВ</button>
+        </div>
+
+        {#if loading}
+            <p>Загрузка мероприятий...</p>
+        {:else if error}
+            <p class="error">Ошибка: {error}</p>
+        {:else if events.length === 0}
+            <p>Нет мероприятий</p>
+        {:else}
+            {#each events as event}
+            <div class="event">
+                <div class="event-name-panel">
+                    <div class="event-name">{event.event_name}</div>
+                </div>
+                <div class="buttons">
+                    <button class="time-btn" on:click={() => viewTime(event)}>Время</button>
+                    <button class="date-btn" on:click={() => viewDate(event)}>Дата</button>
+                </div>
+            </div>
+            {/each}
+        {/if}
+    </div>
+</div>
+
+
+
 <style>/* Глобальные стили для всей страницы */
-    :global(html, body) {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        height: 100%;
-        background-color: #171615; /* Черный фон для всей страницы */
-        color: white;
-        font-family: "Inter", sans-serif;
-        overflow-y: auto; /* Разрешаем прокрутку всей страницы */
-    }
+
     
     .container {
         display: flex;
@@ -358,55 +467,22 @@
     }
 
 }
+.logout-btn {
+    margin-left: 10px;
+    margin-bottom: 30px;
+    background: transparent;
+    border: 2px solid #444444;
+    color: white;
+    padding: 10px 20px;
+    font-size: 20px;
+    border-radius: 30px;
+    cursor: pointer;
+  }
+
+  .logout-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
 
 </style>
 
-<div class="container">
-    <!-- Логотип -->
-    <a href="http://localhost:5173/">
-        <img src="/itam_logo.png" alt="Логотип" class="logo" />
-    </a>
-    
-    <!-- Header -->
-    <div class="header">
-        <div class="profile-container">
-            <div class="profile-glow"></div>
-            <div class="profile-image"></div>
-        </div>
-        <div>
-            <div class="title">Имя Пользователя</div>
-            <div class="subtitle">Почта</div>
-        </div>
-    </div>
-
-    <!-- Новый раздел "Данные" -->
-    <div class="data-section">
-        <h2>Данные</h2>
-        <div class="data-panels">
-            <div class="data-panel ">+7 (xxx) xxx-xx-xx</div>
-            <div class="data-panel ">pochtapolizov@pochta.com</div>
-            <div class="data-panel ">N курс БХХХ - N - N</div>
-        </div>
-    </div>
-
-    <!-- Events Section -->
-    <div class="events-list">
-        <div class="events-header">
-            <h2>МЕРОПРИЯТИЯ</h2>
-            <a href="http://localhost:5173/archive" class="archive-btn">АРХИВ</a>
-        </div>
-
-        <!-- Event List -->
-        {#each events as event}
-        <div class="event">
-            <div class="event-name-panel">
-                <div class="event-name">{event.name}</div>
-            </div>
-            <div class="buttons">
-                <button class="time-btn" on:click={() => viewTime(event.id)}>Время: {event.time}</button>
-                <button class="date-btn" on:click={() => viewDate(event.id)}>Дата: {event.date}</button>
-            </div>
-        </div>
-        {/each}
-    </div>
-</div>

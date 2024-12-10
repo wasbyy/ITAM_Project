@@ -39,7 +39,7 @@
         if (response.ok) {
           console.log("Login successful:", data);
           localStorage.setItem("auth_token", data.access_token);
-          goto("/");
+          goto("/lk/user");
         } else {
           console.log("Error:", data.message || "Что-то пошло не так");
         }
@@ -54,23 +54,25 @@
 
 <Icon id="logo" />
 
-<div class="login-container">
-  <h1 class="title">Вход</h1>
-  <input type="text" placeholder="Логин" bind:value={username} />
-  <input type="password" placeholder="Пароль" bind:value={password} />
-  <button class="btn" on:click={handleLogin}>Войти</button>
-  <a href="http://localhost:5173/auntification/registration"
-    ><p class="register-text">Зарегистрироваться</p></a
-  >
+<div class="page-container">
+  <div class="login-container">
+    <h1 class="title">Вход</h1>
+    <input type="text" placeholder="Логин" bind:value={username} />
+    <input type="password" placeholder="Пароль" bind:value={password} />
+    <button class="btn" on:click={handleLogin}>Войти</button>
+    <a href="http://localhost:5173/auntification/registration">
+      <p class="register-text">Зарегистрироваться</p>
+    </a>
+  </div>
 </div>
 
 <style>
-  /* Ваши стили остаются без изменений */
-  :global(body) {
-    margin: 0;
+  /* Стили для общего контейнера */
+  .page-container {
+    margin: -8px;
     padding: 0;
     font-family: "Inter", sans-serif;
-    background-color: #1e1d1c; /* Темный фон */
+    background-color: #171615; /* Темный фон */
     color: white; /* Белый текст */
     display: flex;
     justify-content: center;
@@ -78,6 +80,7 @@
     height: 100vh;
   }
 
+  /* Стили для контейнера входа */
   .login-container {
     position: relative;
     background: #1a1a1a;
@@ -88,7 +91,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6); /* Более яркая тень */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6); /* Тень */
+    border: 2px solid #2ecc71; /* Обводка панели */
   }
 
   .login-container::before {
@@ -194,6 +198,7 @@
   .register-text:hover {
     color: #00ff99;
   }
+
   @media (max-width: 768px) {
     /* Уменьшаем размеры контейнера и элементов */
     .login-container {

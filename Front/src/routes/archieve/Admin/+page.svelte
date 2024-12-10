@@ -1,82 +1,91 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import Icon from "$lib/components/Icon.svelte";
+    import { BASE_URL } from "../../../config";
+    import { goto } from "$app/navigation";
 
-    // Интерфейс для описания структуры мероприятия
-    interface Event {
-        id: number; // Уникальный идентификатор события
-        title: string; // Название мероприятия
-        image: string; // URL изображения
-        date: string; // Дата мероприятия
-        description: string; // Краткое описание
-        place: string; // Место проведения
-        tags: string[]; // Теги мероприятия
+    interface ArchivedEvent {
+        event_id: number;
+        event_name: string;
+        date: string;
+        short_description: string;
+        place: string;
+        tags: string[];
+        image?: string;
     }
 
-    // Типизируем массив мероприятий
-    let events: Event[] = [];
+    let events: ArchivedEvent[] = [];
+    let isLoading = true; // Состояние загрузки
 
-    // Функция для загрузки данных с сервера
     async function loadArchivedEvents(): Promise<void> {
-        try {
-            const response = await fetch('/archived_events');
-            if (response.ok) {
-                // Определяем тип данных, возвращаемых сервером
-                const data: Array<{
-                    event_id: number;
-                    event_name: string;
-                    date: string;
-                    short_description: string;
-                    place: string;
-                    tags: string[];
-                }> = await response.json();
+    try {
+        const response = await fetch(`${BASE_URL}/archived_events`);
+        if (response.ok) {
+            const data: ArchivedEvent[] = await response.json();
 
-                // Преобразуем данные в ожидаемый формат
-                events = data.map(event => ({
-                    id: event.event_id,
-                    title: event.event_name,
-                    image: "https://via.placeholder.com/150", // Если есть изображение в данных, замените его
-                    date: event.date,
-                    description: event.short_description,
-                    place: event.place,
-                    tags: event.tags,
-                }));
+            // Параллельная загрузка изображений
+            const images = await Promise.all(data.map(event => fetchEventImage(event.event_id)));
+
+            // Ассоциируем изображения с мероприятиями
+            events = data.map((event, index) => ({
+                ...event,
+                image: images[index] || "https://via.placeholder.com/150",
+            }));
+        } else {
+            console.error("Ошибка при получении данных:", response.status);
+        }
+    } catch (error) {
+        console.error("Ошибка при запросе данных:", error);
+    } finally {
+        isLoading = false;
+    }
+}
+
+
+    async function fetchEventImage(eventId: number): Promise<string> {
+        try {
+            const response = await fetch(`${BASE_URL}/show_event_image/${eventId}`);
+            if (response.ok) {
+                const imageBlob = await response.blob();
+                return URL.createObjectURL(imageBlob);
             } else {
-                console.error("Ошибка при получении данных:", response.status);
+                console.error(`Ошибка загрузки изображения для мероприятия с ID ${eventId}: ${response.status}`);
+                return "";
             }
-        } catch (error: unknown) {
-            if (error instanceof Error) {
-                console.error("Ошибка при запросе данных:", error.message);
-            } else {
-                console.error("Произошла неизвестная ошибка");
-            }
+        } catch (error) {
+            console.error(`Ошибка запроса изображения для мероприятия с ID ${eventId}:`, error);
+            return "";
         }
     }
 
-    // Загружаем события при монтировании компонента
+    function navigateToEvent(eventId: number): void {
+        goto(`/archive_event/${eventId}`);
+    }
+
     onMount(() => {
         loadArchivedEvents();
     });
+    
 </script>
 
 <style>
-    /* Стили остаются без изменений */
+    
     * {
         font-family: "Inter", sans-serif;
     }
-
     .background-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background-color: #1d1d1d;
-        z-index: -1;
-    }
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #171615;
+    z-index: -1;
+}
+
 
     .container {
-        max-width: 84%;
+        max-width: 100%;
         margin: 20px auto;
         padding: 20px;
         color: white;
@@ -84,7 +93,7 @@
 
     h1 {
         color: white;
-        text-align: left;
+        text-align: center;
         font-size: 64px;
         margin-bottom: 50px;
         text-transform: uppercase;
@@ -98,13 +107,14 @@
     }
 
     .card {
+        cursor: pointer;
         background-color: #333;
         border-radius: 8px;
         overflow: hidden;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
         transition: transform 0.3s ease;
         padding: 10px;
-        width: 265px;
+        width: 250px;
     }
 
     .card:hover {
@@ -121,9 +131,27 @@
     .card-title {
         margin-top: 20px;
         margin-bottom: 10px;
-        font-size: 32px;
+        font-size: 28px;
         color: white;
         text-align: center;
+    }
+
+    .card-description {
+        font-size: 14px;
+        color: #ccc;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .loading-message {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        color: white;
+        font-size: 32px;
+        font-weight: bold;
+        text-transform: uppercase;
     }
 </style>
 
@@ -131,14 +159,17 @@
 <div class="background-container"></div>
 
 <div class="container">
-    <h1>Архивные мероприятия</h1>
-    <div class="grid">
-        {#each events as event}
-            <div class="card">
-                <img src={event.image} alt={event.title} />
-                <div class="card-title">{event.title}</div>
-                <div class="card-description">{event.description}</div>
-            </div>
-        {/each}
-    </div>
+    {#if isLoading}
+        <div class="loading-message">Загрузка...</div>
+    {:else}
+        <h1>Архивные мероприятия</h1>
+        <div class="grid">
+            {#each events as event}
+                <div class="card" on:click={() => navigateToEvent(event.event_id)}>
+                    <img src={event.image} alt={event.event_name} />
+                    <div class="card-title">{event.event_name}</div>
+                </div>
+            {/each}
+        </div>
+    {/if}
 </div>

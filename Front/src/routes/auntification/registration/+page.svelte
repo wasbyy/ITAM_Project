@@ -98,7 +98,7 @@
                 const result = await response.json();
                 console.log('Успешный ответ:', result);
                 showNotification('Регистрация успешна!', 'success');
-                goto('/');
+                goto('/auntification/authorization/user');
             } else {
                 const error = await response.json();
                 console.error('Ошибка регистрации:', error);

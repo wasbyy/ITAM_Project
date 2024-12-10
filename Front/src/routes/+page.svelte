@@ -27,7 +27,7 @@
       return URL.createObjectURL(blob);
     } catch (error) {
       console.error("Ошибка загрузки изображения:", error);
-      return "https://via.placeholder.com/540x270"; // Плейсхолдер
+      return "https://via.placeholder.com/400x400"; // Плейсхолдер
     }
   };
 
@@ -78,7 +78,7 @@
     const url =
       role === '"admin"'
         ? "/lk/admin"
-        : role === "user"
+        : role === '"user"'
           ? "/lk/user"
           : "/error";
     goto(url);
@@ -99,7 +99,7 @@
 
   // Обработка клика на карточку мероприятия
   const handleEventClick = (eventId: number) => {
-    goto(`/Event/${eventId}`);
+    goto(`/event/${eventId}`);
   };
 
   // Загрузка данных при монтировании компонента
@@ -173,13 +173,13 @@
 
 <style>
   /* Стили для глобальных элементов страницы */
-  :global(body) {
-    margin: 0; /* Убираем отступы */
-    padding: 0; /* Убираем внутренние отступы */
-    background: #171615; /* Цвет фона страницы */
-    overflow-x: hidden; /* Отключаем горизонтальную прокрутку */
-    font-family: "Inter", sans-serif; /* Устанавливаем шрифт для страницы */
-  }
+    :global(body) {
+      margin: 0; /* Убираем отступы */
+      padding: 0; /* Убираем внутренние отступы */
+      background: #171615; /* Цвет фона страницы */
+      overflow-x: hidden; /* Отключаем горизонтальную прокрутку */
+      font-family: "Inter", sans-serif; /* Устанавливаем шрифт для страницы */
+    }
   .page{
     display: flex;
     flex-direction: column;
@@ -441,5 +441,9 @@
   }
   .profile-btn {
     display: block; /* Изначально будем показывать кнопку профиля, если есть токен */
+  }
+  .loading-indicator{
+    color: white;
+    font-size: 20px;
   }
 </style>

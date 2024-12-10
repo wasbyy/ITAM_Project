@@ -1,83 +1,69 @@
 <script lang="ts">
   import { goto } from '$app/navigation'; // Для навигации
   import { onMount } from 'svelte'; // Для загрузки данных после монтирования компонента
-
-  // Описание интерфейса для события
+  import { BASE_URL } from '../../../config';
+  
   interface Event {
     event_id: number;
     event_name: string;
-    // Дополнительные свойства можно добавить при необходимости
   }
 
-  // Массив для хранения событий
   let events: Event[] = [];
 
-  // Функция для получения списка мероприятий через API
   async function fetchEvents() {
     try {
-      const response = await fetch('http://62.84.122.113:8000/events');
+      const response = await fetch(`${BASE_URL}/events`);
       if (!response.ok) {
         throw new Error('Не удалось загрузить данные');
       }
-      const data: Event[] = await response.json(); // Типизация данных
+      const data: Event[] = await response.json();
       events = data;
     } catch (error) {
       console.error('Ошибка при получении данных:', error);
     }
   }
 
-  // Функция для перехода на страницу статистики
   function viewStatistics(eventId: number) {
     goto(`/analytics/${eventId}`);
   }
 
-  // Функция для редактирования события
   function editEvent(eventId: number) {
-    goto(`/EditEvent/${eventId}`);
+    goto(`/edit_event/${eventId}`);
   }
 
-  // Загружаем данные при монтировании компонента
+  function logout() {
+    localStorage.removeItem('auth_token'); // Удаление токена из localStorage
+    goto('/'); // Перенаправление на страницу входа
+  }
+
   onMount(() => {
     fetchEvents();
   });
-
-  // Функция для создания нового мероприятия
-  // function createEvent() {
-  //   goto('/AddEvent'); // Переход на страницу создания мероприятия
-  // }
-
-  // Переход в архив
-  // function goToArchive() {
-  //   goto('/archieve/Admin');
-  // }
 </script>
 
 <div class="container">
-  <!-- Логотип -->
   <a href="/">
     <img src="/itam_logo.png" alt="Логотип" class="logo" />
   </a>
 
-  <!-- Header -->
   <div class="header">
     <div class="profile-icon"></div>
     <div>
       <div class="title">Имя Пользователя</div>
       <div class="subtitle">Почта</div>
     </div>
+    <button class="logout-btn" on:click={logout}>Выйти</button>
   </div>
 
-  <!-- Секция мероприятий -->
   <div class="events-list">
     <div class="events-header">
       <h2>МЕРОПРИЯТИЯ</h2>
       <div class="buttons-right">
-        <button class="archive-btn" on:click={()=>goto('/archieve/Admin')}>АРХИВ</button>
-        <button class="create-btn" on:click={()=>goto('/AddEvent')}>+</button>
+        <button class="archive-btn" on:click={() => goto('/archieve/admin')}>АРХИВ</button>
+        <button class="create-btn" on:click={() => goto('/add_event')}>+</button>
       </div>
     </div>
 
-    <!-- Перебор и отображение всех мероприятий -->
     {#each events as event}
     <div class="event">
       <div class="event-name-panel">
@@ -388,5 +374,19 @@
       font-size: 10px;
     }
   }
-  
+  .logout-btn {
+    margin-left: 20px;
+    margin-bottom: 30px;
+    background: transparent;
+    border: 2px solid #444444;
+    color: white;
+    padding: 8px 18px;
+    font-size: 20px;
+    border-radius: 30px;
+    cursor: pointer;
+  }
+
+  .logout-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
 </style>

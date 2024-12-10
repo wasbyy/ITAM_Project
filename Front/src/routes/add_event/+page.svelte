@@ -172,7 +172,7 @@
     }
 
     h1 {
-        font-size: 46px;
+        font-size: 42px;
         font-family: 'Epilepsy Sans', sans-serif;
         color: white;
         margin-top: 90px;

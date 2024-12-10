@@ -11,8 +11,8 @@
         // Переход на соответствующую страницу
         const url =
           role === "participant"
-            ? "/auntification/authorization/User"
-            : "/auntification/authorization/Admin";
+            ? "/auntification/authorization/user"
+            : "/auntification/authorization/admin";
         window.location.href = url;
       }, 100); 
     }

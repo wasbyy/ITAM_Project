@@ -39,7 +39,7 @@
                 if (response.ok) {
                     console.log('Login successful:', data);
                     localStorage.setItem('auth_token', data.access_token);
-                    goto('/')
+                    goto('/lk/admin')
                 } else {
                     console.log('Error:', data.message || 'Что-то пошло не так');
                 }

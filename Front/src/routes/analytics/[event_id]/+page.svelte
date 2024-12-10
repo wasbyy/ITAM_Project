@@ -1,5 +1,8 @@
 <script lang="ts">
     import { page } from '$app/stores';
+  import Icon from '$lib/components/Icon.svelte';
+    import { BASE_URL } from '../../../config';
+    
   
     // Получение event_id из параметров маршрута
     export let event_id: string = $page.params.event_id;
@@ -15,7 +18,7 @@
       throw new Error('Токен не найден, необходимо авторизоваться');
     }
 
-    const response = await fetch(`http://62.84.122.113:8000/event_members/${eventId}`, {
+    const response = await fetch(`${BASE_URL}/event_members/${eventId}`, {
       method: 'GET',
       headers: {
         'Authorization': `${token}`, // Добавляем токен в заголовок
@@ -46,6 +49,7 @@
     fetchStatistics(event_id);
   </script>
   
+  <Icon id="logo" />
   <div class="page-background">
     <h1>Участники мероприятия</h1>
   
@@ -81,6 +85,7 @@
 
 .page-background {
   display: flex;
+  margin-top: 50px;
   flex-direction: column;
   align-items: center;
   padding: 20px;
