@@ -8,7 +8,7 @@ from confirm_registration import confirm_router
 app = FastAPI(title="ITAM_Project")
 
 # Настройка CORS
-origins = ["*"]  # Разрешить запросы с любых доменов
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,

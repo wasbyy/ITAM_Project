@@ -1,8 +1,7 @@
-from datetime import timedelta
 from typing import Union
 
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
+from fastapi import Depends, HTTPException, Security
+from fastapi.security import OAuth2PasswordBearer, APIKeyHeader
 from jose import jwt, JWTError
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -15,6 +14,9 @@ from db.session import get_db
 from hashing import Hasher
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login/token")
+
+API_KEY_NAME = "Authorization"
+api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
 
 async def _get_user_by_email_for_auth(email: str, session):
         async with session.begin():
@@ -37,8 +39,12 @@ async def authenticate_user(
     return user
 
 async def get_current_user_from_token(
-    token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
+    authorization: str = Security(api_key_header), db: AsyncSession = Depends(get_db)
 ):
+    if not authorization:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    token = authorization.split()[-1]
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",

@@ -352,7 +352,7 @@
   .logo {
     position: absolute;
     top: 50px;
-    right: 100px;
+    right: 78px;
     width: 100px; /* Размер логотипа */
     height: auto;
     cursor: pointer;
