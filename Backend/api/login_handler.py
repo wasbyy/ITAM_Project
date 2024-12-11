@@ -1,13 +1,13 @@
 from datetime import timedelta
 
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordRequestForm
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from api.actions.auth import authenticate_user
-from db.settings import ACCESS_TOKEN_EXPIRE_MINUTES, SECRET_KEY, ALGORITHM
+from db.settings import ACCESS_TOKEN_EXPIRE_MINUTES
 from api.models import Token
 from db.session import get_db
 from security import create_access_token
@@ -29,4 +29,5 @@ async def login_for_access_token(
         data={"sub": user.email, "other_custom_data": user.role},
         expires_delta=access_token_expires,
     )
+
     return {"access_token": access_token, "token_type": "bearer"}

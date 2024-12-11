@@ -3,11 +3,9 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional
 
-from fastapi import UploadFile
-from pydantic import BaseModel, constr
+from pydantic import BaseModel
 
 
-#Конвертирует все что не словарь в json
 class TunedModel(BaseModel):
     class Config:
         """tells pydantic to convert even non dict obj to json"""
@@ -28,6 +26,7 @@ class ShowEvent(TunedModel):
     event_name: str
     place: str
     long_description: str
+    short_description: str
     max_count_of_members: int
     online_event_link: str
     format: str
@@ -56,6 +55,15 @@ class EventCard(TunedModel):
 
 class UpdateEventResponse(BaseModel):
     updated_event_id: int
+
+class UserInfoInCab(TunedModel):
+    user_id: int
+    telegram_id: Optional[str] = None
+    name: str
+    email: str
+    telephone_number: Optional[str] = None
+    course: Optional[int] = None
+    university_group: Optional[str] = None
 
 class UserCreate(BaseModel):
     name: str
@@ -106,10 +114,6 @@ class UserUpdateRequest(BaseModel):
 class UpdateUserResponse(BaseModel):
     updated_user_id: int
 
-class RegistrationCreate(BaseModel):
-    user_id: int
-    event_id: int
-
 class RegistrationResponse(BaseModel):
     resp: str
 
@@ -118,9 +122,9 @@ class ShowRegistrationUser(TunedModel):
     time_of_registration: datetime
 
 class ShowEventInUserCab(TunedModel):
+    event_id: int
     event_name: str
     date: datetime
-
 
 class Token(BaseModel):
     access_token: str

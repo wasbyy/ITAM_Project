@@ -1,17 +1,15 @@
 from fastapi import Depends
 from sqlalchemy import select
 
-from api.models import RegistrationCreate
 from db.dals import RegistrationDAL
 from db.models import Registration
 from db.session import get_db
 
 
 # Проверка наличия существующей регистрации
-async def _check_registrate(registration_data: RegistrationCreate, db=Depends(get_db)):
+async def _check_registrate(event_id: int, db=Depends(get_db)):
     stmt = select(Registration).where(
-        Registration.user_id == registration_data.user_id,
-        Registration.event_id == registration_data.event_id
+        Registration.event_id == event_id
     )
     result = await db.execute(stmt)
     existing_registration = result.scalar_one_or_none()

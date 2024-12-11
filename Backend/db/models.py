@@ -1,8 +1,8 @@
-from falcon.util.misc import utcnow
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime, func, LargeBinary
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime, func, LargeBinary, text
 from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
+
 
 class Event(Base):
     __tablename__ = 'events'
@@ -23,7 +23,7 @@ class User(Base):
     __tablename__ = 'users'
     user_id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    telegram_id = Column(String, nullable=False)
+    telegram_id = Column(String, nullable=True)
     email = Column(String, nullable=False)
     hashed_password = Column(String, nullable=False)
     role =Column(String, nullable=False)
@@ -37,11 +37,10 @@ class User(Base):
 
 class Registration(Base):
     __tablename__ = 'registrations'
-
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('users.user_id'))
     event_id = Column(Integer, ForeignKey('events.event_id'))
-    time_of_registration = Column(DateTime, server_default=func.now())
+    time_of_registration = Column(DateTime, server_default=text("timezone('Europe/Moscow', now())"))
     user = relationship('User', back_populates='registrations')
     event = relationship('Event', back_populates='registrations')
 

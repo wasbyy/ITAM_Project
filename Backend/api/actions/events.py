@@ -41,6 +41,7 @@ async def _get_event_by_id(event_id: int, session) -> ShowEvent:
                 event_name=event.event_name,
                 place=event.place,
                 long_description=event.long_description,
+                short_description=event.short_description,
                 max_count_of_members=event.max_count_of_members,
                 online_event_link=event.online_event_link,
                 format = event.format,

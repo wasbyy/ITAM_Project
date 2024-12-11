@@ -1,13 +1,10 @@
 from datetime import datetime
 from typing import Union
 from uuid import UUID
-import secrets
 
-from fastapi import UploadFile, File
 from sqlalchemy import and_, update, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from api.actions.images import upload_image
 from db.models import Event, User, Registration
 
 class EventDAL:
