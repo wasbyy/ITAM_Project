@@ -1,7 +1,8 @@
 <script lang="ts">
     import Icon from "$lib/components/Icon.svelte";
-  import { getCookie } from "$lib/utils/utilCookie";
+    import { getCookie } from "$lib/utils/utilCookie";
     import { BASE_URL } from "../../config";
+    import { goto } from "$app/navigation";
 
     let title: string = '';
     let tags: string = '';
@@ -10,12 +11,11 @@
     let date: string = '';
     let time: string = '';
     let location: string = '';
-    let maxCountOfMembers: number; // Инициализация значением по умолчанию
+    let maxCountOfMembers: number;
     let format: 'offline' | 'online' | 'offline с трансляцией' = 'offline';
     let onlineEventLink: string = ' ';
     let file: FileList | null = null;
 
-    // Переменные для отслеживания ошибок
     let errors = {
         title: false,
         tags: false,
@@ -24,18 +24,16 @@
         date: false,
         time: false,
         location: false,
-        maxCountOfMembers: false, // Добавляем ошибку для maxCountOfMembers
+        maxCountOfMembers: false,
         onlineEventLink: false,
     };
 
-    // Маппинг форматов на русский
     const formatLabels = {
         offline: 'Офлайн',
         online: 'Онлайн',
         offline_with_streaming: 'Офлайн с трансляцией',
     };
 
-    // Валидация полей формы
     function validateFields(): boolean {
         errors = {
             title: !title.trim(),
@@ -45,7 +43,7 @@
             date: !date.trim(),
             time: !time.trim(),
             location: !location.trim(),
-            maxCountOfMembers: !maxCountOfMembers, // Проверка на пустое значение или 0
+            maxCountOfMembers: !maxCountOfMembers,
             onlineEventLink: (format === 'online' || format === 'offline с трансляцией') && !onlineEventLink.trim(),
         };
 
@@ -75,7 +73,7 @@
             formData.append('short_description', shortDescription);
             formData.append('long_description', longDescription);
             formData.append('max_count_of_members', maxCountOfMembers.toString());
-            formData.append('format', format); // Отправляем формат в оригинале, а не переведенный
+            formData.append('format', format);
             formData.append('date', eventDate);
             formData.append('online_event_link', onlineEventLink || '');
             formData.append('tags', tags);
@@ -94,9 +92,10 @@
 
             if (response.ok) {
                 alert('Мероприятие создано!');
+                goto('/lk/admin');
             } else {
                 const errorText: string = await response.text();
-                
+
                 if (response.status === 403) {
                     alert('Эта функция доступна только для администраторов!');
                 } else {
@@ -113,210 +112,297 @@
     }
 </script>
 
-
 <Icon id="logo" />
 <div class="page-background">
-    <h1>Создание мероприятий</h1>
-    <div class="container">
-        <div class="form">
-            <div class="form-column">
-                <input type="text" bind:value={title} placeholder="Название мероприятия" class:error={errors.title} />
-                <input type="text" bind:value={tags} placeholder="Теги (через пробел)" class:error={errors.tags} />
-                <textarea bind:value={shortDescription} placeholder="Короткое описание (до 150 символов)" class:error={errors.shortDescription}></textarea>
-                <textarea bind:value={longDescription} placeholder="Длинное описание" class:error={errors.longDescription}></textarea>
-                <div class="form-row">
-                    <input type="time" bind:value={time} placeholder="Время" class:error={errors.time} />
-                    <input type="date" bind:value={date} placeholder="Дата" class:error={errors.date} />
-                    <input type="text" bind:value={location} placeholder="Место" class:error={errors.location} />
+    <div class="content-container">
+        <h1>Создание мероприятий</h1>
+        <div class="container">
+            <div class="form">
+                <div class="form-column">
+                    <input type="text" bind:value={title} placeholder="Название мероприятия" class:error={errors.title} />
+                    <input type="text" bind:value={tags} placeholder="Теги (через пробел)" class:error={errors.tags} />
+                    <textarea bind:value={shortDescription} placeholder="Короткое описание (до 150 символов)" class:error={errors.shortDescription}></textarea>
+                    <textarea bind:value={longDescription} placeholder="Длинное описание" class:error={errors.longDescription}></textarea>
+                    <div class="form-row">
+                        <input type="time" bind:value={time} placeholder="Время" class:error={errors.time} />
+                        <input type="date" bind:value={date} placeholder="Дата" class:error={errors.date} />
+                        <input type="text" bind:value={location} placeholder="Место" class:error={errors.location} />
+                    </div>
+                    <div class="form-row narrow">
+                        <input type="number" bind:value={maxCountOfMembers} placeholder="Макс. участников" class:error={errors.maxCountOfMembers} />
+                        <select bind:value={format}>
+                            <option value="offline">Офлайн</option>
+                            <option value="online">Онлайн</option>
+                            <option value="offline с трансляцией">Офлайн с трансляцией</option>
+                        </select>
+                    </div>
+                    {#if format === 'online' || format === 'offline с трансляцией'}
+                        <input type="text" bind:value={onlineEventLink} placeholder="Ссылка на онлайн мероприятие (если нет - пробел)" class:error={errors.onlineEventLink} />
+                    {/if}
+                    <input type="file" accept="image/*" bind:files={file} />
                 </div>
-                <div class="form-row narrow">
-                    <input type="number" bind:value={maxCountOfMembers} placeholder="Макс. участников" class:error={errors.maxCountOfMembers} />
-                    <select bind:value={format}>
-                        <option value="offline">Офлайн</option>
-                        <option value="online">Онлайн</option>
-                        <option value="offline с трансляцией">Офлайн с трансляцией</option>
-                    </select>
-                </div>
-                {#if format === 'online' || format === 'offline с трансляцией'}
-                    <input type="text" bind:value={onlineEventLink} placeholder="Ссылка на онлайн мероприятие (если нет - пробел)" class:error={errors.onlineEventLink} />
-                {/if}
-                <input type="file" accept="image/*" bind:files={file} />
             </div>
         </div>
-    </div>
-    <div class="create-button-container">
-        <!-- Условие для изменения класса кнопки в зависимости от наличия ссылки -->
-        <button on:click={createEvent} class={format !== 'offline' ? 'full-width' : 'small-center'}>Создать</button>
+        <div class="create-button-container">
+            <button on:click={createEvent} class={format !== 'offline' ? 'full-width' : ''}>Создать</button>
+        </div>
+              
     </div>
 </div>
 
-<style>
-    .error {
-        border: 2px solid red;
-    }
+<style>.error {
+    border: 2px solid red;
+}
 
-    .page-background {
-        background-color: #171615;
-        width: 100vw;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 20px;
-        box-sizing: border-box;
-        background-image: url('/createevent.png');
-        background-size: cover;
-        background-position: center center;
-    }
-
-    h1 {
-        font-size: 42px;
-        font-family: 'Epilepsy Sans', sans-serif;
-        color: white;
-        margin-top: 90px;
-        margin-bottom: 30px;
-        text-align: left;
-        width: 100%;
-        max-width: 1200px;
-        margin-right: 3%;
-        font-family: 'Press Start 2P', monospace;
-    }
-
-    .container {
-    width: 90%;
-    max-width: 1200px;
-    padding: 20px;
-    background-color: rgba(36, 36, 35, 0.6); /* Фон с прозрачностью 80% */
-    border-radius: 40px;
-    color: white;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Прозрачность тени */
+.page-background {
+    background-color: #171615;
+    width: 100vw;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+    background-image: url('/createevent.png');
+    background-size: cover;
+    background-position: center center;
+}
+
+.content-container {
+    width: 90%;
+    max-width: 1300px;
+    padding: 15px;
+    margin-right: 40px;
+}
+
+h1 {
+    font-size: 42px;
+    font-family: 'Press Start 2P', monospace;
+    color: white;
+    margin-top: 80px;
+    margin-bottom: 30px;
+    text-align: left;
+    width: 90%;
+}
+
+.container {
+    width: 100%;
+    padding: 15px;
+    background-color: rgba(36, 36, 35, 0.5);
+    border-radius: 40px;
+    color: white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    border: 1.3px solid rgba(255, 255, 255, 0.473);
+}
+
+.form {
+    display: flex;
+    flex-wrap: wrap;
     gap: 20px;
-    border: 1.3px solid rgba(255, 255, 255, 0.473); /* Полупрозрачная граница */
+}
+
+.form-column {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    flex: 1;
+}
+
+input,
+textarea,
+select {
+    background-color: #171615;
+    color: white;
+    border: none;
+    border-radius: 16px;
+    padding: 20px;
+    font-size: 16px;
+}
+
+textarea {
+    min-height: 150px;
 }
 
 
-    .form {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
+textarea:focus,
+select:focus {
+    outline: none;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.form-row input,
+.form-row select {
+    flex: 1;
+    min-width: 100px;
+}
+
+.form-row.narrow {
+    justify-content: space-between;
+}
+
+.create-button-container {
+    width: 100%;
+    display: flex;
+    justify-content: right; /* Выровнять кнопку по правому краю */
+    margin-top: 20px;
+}
+
+
+.create-button-container button {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    background-color: #242423;
+    border: 1.3px solid rgba(255, 255, 255, 0.473);
+    border-radius: 30px;
+    cursor: pointer;
+    width: 200px;
+    transition: background-color 0.3s;
+}
+
+.create-button-container button:hover {
+    background-color: white;
+    color: black;
+}
+
+
+.create-button-container button.full-width {
+    width: 100%;
+}
+
+@media screen and (max-width: 1024px) {
+    h1 {
+        font-size: 28px;
+        text-align: left;
     }
 
-    .form-column {
-        display: flex;
+    .container {
+        padding: 15px;
+        border-radius: 25px;
+        width: 108%;
+    }
+
+    .form {
         flex-direction: column;
         gap: 15px;
-        flex: 1;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 15px;
     }
 
     input,
     textarea,
     select {
-        background-color: #171615;
-        color: white;
-        border: none;
-        border-radius: 16px;
-        padding: 20px;
-        font-size: 20px;
-    }
-
-    textarea {
-        min-height: 150px;
-    }
-
-    input:focus,
-    textarea:focus,
-    select:focus {
-        outline: none;
-        box-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
-    }
-
-    .form-row {
-        display: flex;
-        gap: 15px;
-        width: 100%;
-    }
-
-    .form-row input,
-    .form-row select {
-        flex: 1;
-        width: auto;
-    }
-
-    .form-row.narrow {
-        justify-content: space-between;
+        font-size: 18px;
+        padding: 15px;
     }
 
     .create-button-container {
-        width: 83%;
-        text-align: right;
-        margin-top: 20px;
+        margin-top: 15px;
+        text-align: center;
+        margin-left: 15px;
     }
 
     .create-button-container button {
-        padding: 10px 20px;
+        width: 50%;
+        font-size: 18px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    h1 {
+        font-size: 24px;
+        text-align: left;
+        margin-bottom: 15px
+    }
+
+    .container {
+        padding: 10px;
+        border-radius: 20px;
+        box-shadow: none;
+        width: 105%;
+
+    }
+
+    .form {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    input,
+    textarea,
+    select {
         font-size: 16px;
-        color: white;
-        background-color: #242423;
-        border: 1.3px solid rgba(255, 255, 255, 0.473);
-        border-radius: 30px;
-        cursor: pointer;
-        width: 200px;
-        transition: background-color 0.3s;
+        padding: 10px;
     }
 
-    .create-button-container button:hover {
-        background-color: white;
-        color: black;
+    .create-button-container {
+        margin-top: 10px;
+        text-align: center;
+        margin-right: 10px;
+
     }
 
-    .create-button-container button.small-center {
-        width: auto;
-        margin: 0 auto;
-    }
-
-    .create-button-container button.full-width {
+    .create-button-container button {
         width: 100%;
+        font-size: 18px;
     }
-    @media screen and (max-width: 768px) {
-        h1 {
-            font-size: 24px; /* Уменьшаем размер заголовка для мобильных */
-            text-align: center; /* Выравниваем текст по центру */
-        }
+}
 
-        .container {
-            padding: 10px; /* Уменьшаем отступы */
-            border-radius: 20px; /* Немного меньше радиус */
-            width: 100%; /* Занимает всю ширину экрана */
-            box-shadow: none; /* Убираем тень для минимализма */
-        }
-
-        .form {
-            flex-direction: column; /* Элементы идут в столбик */
-            gap: 10px; /* Меньше промежутки */
-        }
-
-        .form-row {
-            flex-direction: column; /* Поля размещаем в столбик */
-            gap: 10px;
-        }
-
-        input,
-        textarea,
-        select {
-            font-size: 16px; /* Уменьшаем размер шрифта */
-            padding: 10px; /* Уменьшаем внутренние отступы */
-        }
-
-        .create-button-container {
-            margin-top: 10px;
-            text-align: center; /* Центрируем кнопку */
-        }
-
-        .create-button-container button {
-            width: 100%; /* Кнопка занимает всю ширину */
-            font-size: 18px; /* Чуть больше шрифт для удобства на мобильных */
-        }
+@media screen and (max-width: 480px) {
+    h1 {
+        font-size: 22px;
     }
+
+    .container {
+        padding: 8px;
+        border-radius: 15px;
+    }
+
+    .form {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    input,
+    textarea,
+    select {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    .create-button-container {
+        margin-top: 8px;
+        text-align: center;
+        margin-right: 10px;
+    }
+
+    .create-button-container button {
+        width: 100%;
+        font-size: 16px;
+    }
+}
+
 </style>

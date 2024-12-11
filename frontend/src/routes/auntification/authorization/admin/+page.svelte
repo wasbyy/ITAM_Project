@@ -53,37 +53,51 @@
     };
 </script>
 
+
+
+<Icon id="logo"/>
+<div class="page-container">
+  <!-- Контейнер для обводки -->
+  <div class="border-container">
+    <!-- Основная панель входа -->
+    <div class="login-container">
+      <h1 class="title">Вход</h1>
+      <input type="text" placeholder="Логин" bind:value={username} />
+      <input type="password" placeholder="Пароль" bind:value={password} />
+      <button class="btn" on:click={handleLogin}>Войти</button>
+    </div>
+  </div>
+</div>
+
 <style>
 .page-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh; /* Занимает всю высоту страницы */
-}
-
-/* Контейнер для обводки */
-.border-container {
+  height: 100vh;
+  background-image: url("/authAdm.png");
+  background-position: center center;
+  background-size: cover;
   position: relative;
-  padding: 3px; /* Отступ для обводки */
-  background: linear-gradient(135deg, #ff4cf0, #ff8c00, #ff0080, #ff4cf0); /* Градиент для обводки */
-  border-radius: 20px; /* Радиус скругления обводки */
-  z-index: 0; /* Убедитесь, что обводка будет под основной панелью */
 }
 
-.login-container {
-  position: relative;
-  background: #1a1a1a; /* Цвет панели */
-  border-radius: 20px;
-  padding: 2.5rem;
-  width: 400px; /* Ширина контейнера */
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-  z-index: 1; /* Панель будет поверх фонового градиента */
-}
 
+
+
+  /* Стили для контейнера входа */
+  .login-container {
+    position: relative;
+    background: rgba(26, 26, 26, 0.8); /* Прозрачный фон с 80% непрозрачности */
+    border-radius: 20px;
+    padding: 2rem;
+    width: 400px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6); /* Тень */
+    border: 2px solid #666666; /* Обводка панели */
+  }
 .login-container h1 {
   font-size: 2rem;
   margin-top: -0.5rem;
@@ -109,44 +123,33 @@
 .login-container input:focus {
   background: rgba(255, 255, 255, 0.2);
 }
-
+/* Кнопка с прозрачным фоном и белой обводкой */
 .btn {
   position: relative;
-  background: linear-gradient(45deg, #D38312 10%, #A83279 90%);
-  background-size: 200% 100%;
+  background: transparent; /* Прозрачный фон */
+  border: 2px solid white; /* Белая обводка */
   padding: 1rem 1.5rem;
   color: white;
   border-radius: 20px;
   font-size: 1.1rem;
-  border: none;
   width: 50%;
-  animation: gradientAnimation 4s linear infinite;
   transition: all 0.3s ease;
   font-weight: 100;
   font-size: 20px;
 }
 
-@keyframes gradientAnimation {
-  0% {
-    background-position: 0 0;
-  }
-  50% {
-    background-position: 100% 0;
-  }
-  100% {
-    background-position: 0 0;
-  }
-}
-
+/* Эффект при наведении */
 .btn:hover {
-  transform: scale(1.01);
-  box-shadow: 0 4px 10px rgba(255, 255, 255, 0.15);
+    transform: scale(1.05);
+    box-shadow: 0 2px 10px rgba(255, 255, 255, 0.3); /* Белая тень при наведении */
+  }
+
+/* Эффект при нажатии */
+.btn:active {
+  transform: scale(0.95); /* Уменьшение кнопки при нажатии */
+  box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1); /* Легкая тень */
 }
 
-.btn:active {
-  transform: scale(0.95);
-  box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
-}
 
 /* Мобильная адаптация */
 @media (max-width: 768px) {
@@ -173,17 +176,3 @@
 }
 
 </style>
-
-<Icon id="logo"/>
-<div class="page-container">
-  <!-- Контейнер для обводки -->
-  <div class="border-container">
-    <!-- Основная панель входа -->
-    <div class="login-container">
-      <h1 class="title">Вход</h1>
-      <input type="text" placeholder="Логин" bind:value={username} />
-      <input type="password" placeholder="Пароль" bind:value={password} />
-      <button class="btn" on:click={handleLogin}>Войти</button>
-    </div>
-  </div>
-</div>

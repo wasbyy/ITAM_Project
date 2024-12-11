@@ -99,6 +99,8 @@
       }
 
       alert("Данные успешно обновлены!");
+      // Перенаправление на страницу /lk/admin после успешного обновления
+      window.location.href = "/lk/admin";
     } catch (error) {
       console.error("Ошибка обновления данных:", error);
       alert("Не удалось обновить данные.");
@@ -124,6 +126,7 @@
         }
 
         alert("Мероприятие успешно удалено!");
+        // Перенаправление на страницу /lk/admin после успешного удаления
         window.location.href = "/lk/admin";
       } catch (error) {
         console.error("Ошибка удаления мероприятия:", error);
@@ -154,6 +157,7 @@
       }
 
       alert("Мероприятие успешно архивировано!");
+      // Перенаправление на страницу /lk/admin после успешной архивации
       window.location.href = "/lk/admin";
     } catch (error) {
       console.error("Ошибка архивации мероприятия:", error);
@@ -173,7 +177,7 @@
       <div class="form">
         <div class="form-column">
           <input type="text" bind:value={eventData.event_name} placeholder="Название мероприятия" />
-          <input type="text" bind:value={eventData.tags} placeholder="Теги (через пробел)" />
+          <input type="text" bind:value={eventData.tags} placeholder="Короткие теги (через пробел)" />
           <textarea
             bind:value={eventData.short_description}
             placeholder="Короткое описание (до 150 символов)"
@@ -213,9 +217,9 @@
         <button class="update-button" on:click={updateEvent}>Обновить данные</button>
       </div>
     </div>
-    
   {/if}
 </div>
+
 
 <style>
   .page-background {
@@ -234,7 +238,7 @@
 
   h1 {
     font-size: 42px;
-    font-family: "Press Start 2P", monospace;
+    font-family: 'Press Start 2P', monospace;
     color: white;
     margin-top: 80px;
     margin-bottom: 30px;
@@ -245,7 +249,7 @@
   .container {
     width: 90%;
     padding: 15px;
-    background-color: rgba(36, 36, 35, 0.5); /* Установите прозрачность 60% */
+    background-color: rgba(36, 36, 35, 0.5);
     border-radius: 40px;
     color: white;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
@@ -253,8 +257,7 @@
     flex-direction: column;
     gap: 40px;
     border: 1.3px solid rgba(255, 255, 255, 0.473);
-}
-
+  }
 
   .form {
     display: flex;
@@ -302,49 +305,203 @@
   }
 
   .action-buttons-container {
-  display: flex;
-  justify-content: space-between; /* Разнести кнопки на противоположные стороны */
-  align-items: center; /* Выравниваем кнопки по вертикали */
-  margin-top: 20px;
-  width: 92%; /* Убедитесь, что контейнер занимает всю ширину */
-}
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    width: 92%;
+  }
 
-.left-buttons {
-  display: flex;
-  gap: 10px; /* Расстояние между кнопками слева */
-}
+  .left-buttons {
+    display: flex;
+    gap: 10px;
+  }
 
-.right-button {
-  display: flex; /* Убедимся, что кнопка справа остается корректной */
-}
+  .right-button {
+    display: flex;
+  }
 
-.delete-button,
-.update-button,
-.archive-button {
-  padding: 10px 15px;
-  font-size: 14px;
-  color: white;
-  background-color: #242423;
-  border: 1.3px solid rgba(255, 255, 255, 0.473);
-  border-radius: 30px;
-  cursor: pointer;
-  width: 120px;
-  text-align: center;
-  transition: background-color 0.3s;
-}
+  .delete-button,
+  .update-button,
+  .archive-button {
+    padding: 20px 22px;
+    font-size: 15px;
+    color: white;
+    background-color: #242423;
+    border: 1.3px solid rgba(255, 255, 255, 0.473);
+    border-radius: 30px;
+    cursor: pointer;
+    width: 250px;
+    text-align: center;
+    transition: background-color 0.3s;
+  }
 
-.delete-button:hover {
-  background-color: #d9534f;
-}
+  .delete-button:hover {
+    background-color: #d9534f;
+  }
 
-.update-button:hover {
-  background-color: white;
-  color: black;
-}
+  .update-button:hover {
+    background-color: white;
+    color: black;
+  }
 
-.archive-button:hover {
-  background-color: #f0ad4e;
-}
+  .archive-button:hover {
+    background-color: #f0ad4e;
+  }
+
+  @media (max-width: 480px) {
+    h1 {
+      font-size: 24px;
+      margin-top: 80px;
+    }
+
+    input,
+    textarea,
+    select {
+      padding: 8px;
+      font-size: 12px;
+      border-radius: 10px;
+    }
+
+    .action-buttons-container {
+      gap: 3px;
+    }
+
+    .delete-button,
+    .update-button,
+    .archive-button {
+      font-size: 10px;
+      width: 100px;
+      padding: 6px 8px;
+    }
+  }
+  
+  .page-background {
+    background-color: #171615;
+    width: 100vw;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+    background-image: url("/editevent.png");
+    background-size: cover;
+    background-position: center center;
+  }
+
+  h1 {
+    font-size: 42px;
+    font-family: 'Press Start 2P', monospace;
+    color: white;
+    margin-top: 80px;
+    margin-bottom: 30px;
+    text-align: left;
+    width: 90%;
+  }
+
+  .container {
+    width: 90%;
+    padding: 15px;
+    background-color: rgba(36, 36, 35, 0.5);
+    border-radius: 40px;
+    color: white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    border: 1.3px solid rgba(255, 255, 255, 0.473);
+  }
+
+  .form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .form-column {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    flex: 1;
+  }
+
+  input,
+  textarea,
+  select {
+    background-color: #171615;
+    color: white;
+    border: none;
+    border-radius: 16px;
+    padding: 20px;
+    font-size: 16px;
+  }
+
+  .short-description {
+    height: 100px;
+  }
+
+  .long-description {
+    height: 250px;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .form-row input,
+  .form-row select {
+    flex: 1;
+    min-width: 100px;
+  }
+
+  .action-buttons-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    width: 92%;
+  }
+
+  .left-buttons {
+    display: flex;
+    gap: 10px;
+  }
+
+  .right-button {
+    display: flex;
+  }
+
+  .delete-button,
+  .update-button,
+  .archive-button {
+    padding: 20px 22px;
+    font-size: 15px;
+    color: white;
+    background-color: #242423;
+    border: 1.3px solid rgba(255, 255, 255, 0.473);
+    border-radius: 30px;
+    cursor: pointer;
+    width: 250px;
+    text-align: center;
+    transition: background-color 0.3s;
+  }
+
+  .delete-button:hover {
+    background-color: #d9534f;
+  }
+
+  .update-button:hover {
+    background-color: white;
+    color: black;
+  }
+
+  .archive-button:hover {
+    background-color: #f0ad4e;
+  }
 
   @media (max-width: 480px) {
     h1 {
@@ -373,3 +530,4 @@
     }
   }
 </style>
+

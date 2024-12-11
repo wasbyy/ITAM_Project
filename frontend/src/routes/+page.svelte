@@ -21,32 +21,35 @@
   let isLoading = true;
 
   const loadEvents = async () => {
-    try {
-      const response = await fetch(`${BASE_URL}/events`);
-      if (!response.ok) throw new Error("Не удалось загрузить мероприятия");
-      const data: Event[] = await response.json();
+  try {
+    const response = await fetch(`${BASE_URL}/events`);
+    if (!response.ok) throw new Error("Не удалось загрузить мероприятия");
+    const data: Event[] = await response.json();
 
-      events = await Promise.all(
-        data.map(async (event) => ({
-          ...event,
-          image_url: await (async () => {
-            try {
-              const imgResponse = await fetch(`${BASE_URL}/show_event_image/${event.event_id}`);
-              if (!imgResponse.ok) throw new Error("Не удалось загрузить изображение");
-              const blob = await imgResponse.blob();
-              return URL.createObjectURL(blob);
-            } catch {
-              return "https://avatars.mds.yandex.net/i?id=166c32386ec148d145f75f850da055e2298d59d7-12472594-images-thumbs&n=13"; // Плейсхолдер
-            }
-          })(),
-        }))
-      );
-    } catch (error) {
-      console.error("Ошибка загрузки данных мероприятий:", error);
-    } finally {
-      isLoading = false;
-    }
-  };
+    events = await Promise.all(
+      data.map(async (event) => ({
+        ...event,
+        image_url: await (async () => {
+          try {
+            const imgResponse = await fetch(`${BASE_URL}/show_event_image/${event.event_id}`);
+            if (!imgResponse.ok) throw new Error("Не удалось загрузить изображение");
+            const blob = await imgResponse.blob();
+            return URL.createObjectURL(blob);
+          } catch {
+            return "https://avatars.mds.yandex.net/i?id=166c32386ec148d145f75f850da055e2298d59d7-12472594-images-thumbs&n=13"; // Плейсхолдер
+          }
+        })(),
+      }))
+    );
+
+    // Сортируем мероприятия по event_id (по возрастанию)
+    events.sort((a, b) => a.event_id - b.event_id);
+  } catch (error) {
+    console.error("Ошибка загрузки данных мероприятий:", error);
+  } finally {
+    isLoading = false;
+  }
+};
 
   const getUserRole = async () => {
     try {
@@ -124,39 +127,75 @@
         {/each}
       </div>
     {/if}
+  
+</div>
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-logo">
+      <img src="/itam_logo.png" alt="Логотип ITAM" />
+      <p>2024</p>
+    </div>
+    <div class="footer-credits">
+      <div class="footer-role">
+        <p>Frontend</p>
+        <p>@Wasbyy</p>
+      </div>
+      <div class="footer-role">
+        <p>Backend</p>
+        <p>@dontpaniczy</p>
+      </div>
+      <div class="footer-role">
+        <p>Design</p>
+        <p>@aantaars</p>
+        <p>@kisssssssik</p>
+        <p>@thePolishaz3</p>
+      </div>
+    </div>
   </div>
+</footer>
+
 </div>
 
 
 <style>
 
-  .page{
+.page{
     display: flex;
     flex-direction: column;
   }
-  /* Контейнер для главной страницы */
-  .container { /* Контейнер позиционируется относительно родителя */
-    height: 100vh; /* Высота контейнера — 100% от высоты экрана */
-    width: 100vw; /* Ширина контейнера — 100% от ширины экрана */
-    display: flex; /* Используем flexbox для удобного выравнивания */
-    flex-direction: column; /* Элементы внутри контейнера выстраиваются по вертикали */
-    align-items: center; /* Выравниваем элементы по центру по горизонтали */
-    justify-content: center; /* Выравниваем элементы по центру по вертикали */
-    text-align: center; /* Выравниваем текст по центру */
-    overflow: hidden; /* Прячем все, что выходит за пределы контейнера */
-    position: relative; /* Добавляем относительное позиционирование */
-  }
+  .container {
+  position: relative; /* Для управления абсолютным позиционированием внутри */
+  height: 100vh; /* Высота контейнера — 100% от высоты экрана */
+  width: 100vw; /* Ширина контейнера — 100% от ширины экрана */
+  display: flex; /* Используем flexbox для выравнивания */
+  align-items: center; /* Выравниваем элементы по вертикали */
+  justify-content: center; /* Выравниваем элементы по горизонтали */
+  text-align: center; /* Текст будет выравнен по центру */
+  overflow: hidden; /* Прячем содержимое за пределами контейнера */
+}
+
+.title {
+  position: relative; /* Не используем абсолютное позиционирование */
+  font-size: 85px; /* Размер шрифта заголовка */
+  color: white; /* Белый цвет текста */
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.4); /* Тень для текста */
+  text-transform: uppercase; /* Преобразуем текст в верхний регистр */
+  font-family: "Press Start 2P", monospace; /* Шрифт в стиле ретро */
+  z-index: 1; /* Заголовок над фоном */
+}
+
 
   /* Фон для страницы */
 /* Фон для страницы */
 .background {
   position: absolute; /* Абсолютное позиционирование для фонового изображения */
-  top: 0; /* Прикрепляем к верхней части */
+  top: 0px; /* Прикрепляем к верхней части */
   left: 0; /* Прикрепляем к левой части */
   width: 100%; /* Задаем ширину на весь экран */
   height:100%; /* Минимальная высота — 100% от высоты экрана, чтобы фон не обрезался */
   background: url("/background.png");
   background-size: cover;
+  background-position: center ;
   filter: brightness(1.1); /* Немного увеличиваем яркость фона */
   z-index: 0; /* Фон будет находиться позади всех остальных элементов */
 }
@@ -236,14 +275,8 @@
     color: black; /* Цвет текста становится черным */
   }
 
-  /* Заголовок на главной странице */
-  .title {
-    font-size: 100px; /* Размер шрифта заголовка */
-    color: white; /* Белый цвет текста */
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.4); /* Тень для текста */
-    text-transform: uppercase; /* Преобразуем текст в верхний регистр */
-    font-family: "Press Start 2P", monospace; /* Шрифт в стиле ретро */
-  }
+
+
 
   /* Стиль для "страницы" мероприятий */
   .gray-background {
@@ -335,6 +368,7 @@
 
   /* Стиль для заголовков мероприятий */
   .event-card .info h3 {
+    width: 90%;
     margin: 0; /* Убираем отступы */
     font-size: 32px; /* Устанавливаем больший размер шрифта */
     color: #fff; /* Белый цвет текста */
@@ -345,12 +379,15 @@
 
   /* Контейнер для тегов */
   .event-card .tags {
-    display: flex; /* Используем flexbox для выравнивания тегов */
-    flex-direction: column; /* Теги будут располагаться в столбик */
-    gap: 10px; /* Отступы между тегами */
-    justify-content: flex-start; /* Выравнивание по верхнему краю */
-    align-items: flex-start; /* Выравнивание по левому краю */
-  }
+  position: absolute; /* Абсолютное позиционирование */
+  top: 20px; /* Отступ сверху */
+  right: 20px; /* Отступ справа */
+  display: flex; /* Используем flexbox для выравнивания тегов */
+  flex-direction: row; /* Теги будут располагаться в строку */
+  gap: 10px; /* Отступы между тегами */
+  justify-content: flex-start; /* Выравнивание по верхнему краю */
+  align-items: center; /* Выравнивание по правому краю */
+}
 
   /* Стили для каждого тега */
   .event-card .tags .tag {
@@ -377,4 +414,198 @@
     color: white;
     font-size: 20px;
   }
+
+  /* Медиа-запросы для мобильных устройств */
+  @media (max-width: 768px) {
+    .footer-container {
+      flex-direction:row; /* Выстраиваем элементы вертикально */
+      align-items: center; /* Центрируем элементы */
+      height: auto; /* Автоматическая высота */
+    }
+
+    .footer-logo {
+      align-items: center; /* Центрируем логотип */
+    }
+
+    .footer-credits {
+      flex-direction: row; /* Выстраиваем роли вертикально */
+      gap: 10px; /* Отступы между ролями */
+    }
+
+    .footer-role {
+      align-items: center; /* Центрируем роли */
+      font-size: 12px; /* Уменьшаем размер шрифта */
+    }
+    .footer-logo img {
+  width: 60px; /* Ширина логотипа */
+  margin-bottom: 10px;
+}
+    
+    .top-bar {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 10px;
+    }
+
+    .title {
+      font-size: 50px;
+    }
+
+    .event-cards {
+      grid-template-columns: 1fr;
+      gap: 15px;
+    }
+
+    .event-card {
+      flex-direction: column;
+      padding: 15px;
+    }
+
+    .event-card img {
+      width: 150px;
+      height: 150px;
+      margin-right: 0;
+      margin-bottom: 15px;
+    }
+
+    .event-card .info h3 {
+      font-size: 24px;
+    }
+
+    .event-card .details {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    .login-btn,
+    .profile-btn {
+      font-size: 1rem;
+      padding: 5px 10px;
+      height: 35px;
+    }
+
+    .logo img {
+      height: 50px;
+    }
+  }
+
+  @media (max-width: 480px) {
+
+    .background{
+      background-image: url("/background(full).png");
+      background-position: center center;
+      background-size: 430px;
+      background-repeat: no-repeat;    
+    }
+    .gray-background{
+      background-size: contain;
+      background-position: center top;
+    }
+    .title {
+      font-size: 24px;
+    }
+    
+    .event-cards{
+      gap: 20px; 
+    }
+    .event-card {
+      padding: 10px;
+    }
+
+    .event-card .info h3 {
+      font-size: 20px;
+    }
+
+    .event-card .details {
+      font-size: 14px;
+    }
+
+    .top-bar {
+    flex-direction: row; /* Горизонтальное расположение */
+    justify-content: space-between; /* Логотип слева, кнопка справа */
+    align-items: center; /* Центрируем элементы по вертикали */
+    padding-top: 5%; /* Отступы сверху и по бокам */
+    margin-left: 10px;
+    width: 100%;
+  }
+
+
+  .logo img {
+    height: 40px; /* Подгоняем размер логотипа */
+    width: auto;
+  }
+
+  .login-btn,
+  .profile-btn {
+    width: auto; /* Автоматическая ширина */
+    height: 35px; /* Уменьшаем высоту кнопок */
+    font-size: 1rem; /* Уменьшаем размер текста */
+    padding: 5px 15px; /* Отступы внутри кнопки */
+  }
+
+    .event-card .tags .tag {
+      font-size: 10px;
+      padding: 4px 8px;
+    }
+    .footer-logo img {
+      margin-right: 10px;
+      width: 40px; /* Уменьшаем размер логотипа */
+
+    }
+
+    .footer-role {
+      font-size: 9px; /* Еще меньший шрифт */
+    }
+    .footer{
+      margin: -10px -20px;
+    }
+  }
+  .footer {
+  color: #e0e0e0; /* Светло-серый текст */
+  padding: 20px 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  border-top: 1px solid #838383; /* Серая полоска */
+
+}
+
+.footer-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 1200px;
+  height: 175px;
+}
+
+.footer-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.footer-logo img {
+  width: 80px; /* Ширина логотипа */
+  margin-bottom: 10px;
+}
+
+.footer-credits {
+  display: flex;
+  gap: 40px;
+}
+
+.footer-role {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.footer-role p:first-child {
+  color: #a0a0a0; /* Серый цвет для ролей */
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
 </style>

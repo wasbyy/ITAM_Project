@@ -2,25 +2,63 @@
   import { goto } from '$app/navigation'; // Для навигации
   import { onMount } from 'svelte'; // Для загрузки данных после монтирования компонента
   import { BASE_URL } from '../../../config';
-  import { eraseCookie } from '$lib/utils/utilCookie';
-  
+  import { eraseCookie, getCookie } from '$lib/utils/utilCookie';
+
   interface Event {
     event_id: number;
     event_name: string;
   }
 
+  interface UserInfo {
+    user_id: number;
+    telegram_id: string;
+    name: string;
+    email: string;
+    telephone_number: string;
+    course: number;
+    university_group: string;
+  }
+
   let events: Event[] = [];
+  let userInfo: UserInfo | null = null;
+  let error: string | null = null;
 
   async function fetchEvents() {
     try {
       const response = await fetch(`${BASE_URL}/events`);
       if (!response.ok) {
-        throw new Error('Не удалось загрузить данные');
+        throw new Error('Не удалось загрузить данные мероприятий');
       }
       const data: Event[] = await response.json();
       events = data;
-    } catch (error) {
-      console.error('Ошибка при получении данных:', error);
+    } catch (err) {
+      console.error('Ошибка при получении данных мероприятий:', err);
+      error = 'Ошибка при загрузке мероприятий';
+    }
+  }
+
+  async function fetchUserInfo() {
+    try {
+      const authToken = getCookie('auth_token');
+      if (!authToken) {
+        throw new Error('Не найден токен авторизации');
+      }
+
+      const response = await fetch(`${BASE_URL}/users_info`, {
+        headers: {
+          'Authorization': `Bearer ${authToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Не удалось загрузить данные пользователя');
+      }
+      const data: UserInfo = await response.json();
+      userInfo = data;
+    } catch (err) {
+      console.error('Ошибка при получении данных пользователя:', err);
+      error = 'Ошибка при загрузке данных пользователя';
     }
   }
 
@@ -39,60 +77,95 @@
 
   onMount(() => {
     fetchEvents();
+    fetchUserInfo();
   });
 </script>
 
 <div class="app-container">
+  <div class="container">
+    <a href="/">
+      <img src="/itam_logo.png" alt="Логотип" class="logo" />
+    </a>
 
-<div class="container">
-  <a href="/">
-    <img src="/itam_logo.png" alt="Логотип" class="logo" />
-  </a>
-
-  <div class="header">
-    <div class="profile-icon"></div>
-    <div>
-      <div class="title">Имя Пользователя</div>
-      <div class="subtitle">Почта</div>
-    </div>
-    <button class="logout-btn" on:click={logout}>Выйти</button>
-  </div>
-
-  <div class="events-list">
-    <div class="events-header">
-      <h2>МЕРОПРИЯТИЯ</h2>
-      <div class="buttons-right">
-        <button class="archive-btn" on:click={() => goto('/archieve/admin')}>АРХИВ</button>
-        <button class="create-btn" on:click={() => goto('/add_event')}>+</button>
+    <div class="header">
+      <div class="profile-icon"></div>
+      <div>
+        {#if userInfo}
+          <div class="title">{userInfo.name}</div>
+          <div class="subtitle">{userInfo.email}</div>
+        {:else if error}
+          <div class="error">{error}</div>
+        {:else}
+          <div class="title">Загрузка...</div>
+          <div class="subtitle">Пожалуйста, подождите</div>
+        {/if}
       </div>
+      <button class="logout-btn" on:click={logout}>Выйти</button>
     </div>
 
-    {#each events as event}
-    <div class="event">
+    <div class="events-list">
+      <div class="events-header">
+        <h2>МЕРОПРИЯТИЯ</h2>
+        <div class="buttons-right">
+          <button class="archive-btn" on:click={() => goto('/archieve/admin')}>АРХИВ</button>
+          <button class="create-btn" on:click={() => goto('/add_event')}>+</button>
+        </div>
+      </div>
+
+      {#if events.length > 0}
+  {#each events as event}
+    <div 
+      class="event" 
+      on:click={() => goto(`/event/${event.event_id}`)}
+    >
       <div class="event-name-panel">
         <div class="event-name">{event.event_name}</div>
       </div>
       <div class="buttons">
-        <button class="stats-btn" on:click={() => viewStatistics(event.event_id)}>Статистика</button>
-        <button class="edit-btn" on:click={() => editEvent(event.event_id)}>Редактировать</button>
+        <button 
+          class="stats-btn" 
+          on:click={(e) => {
+            e.stopPropagation(); // Остановить всплытие события
+            viewStatistics(event.event_id);
+          }}
+        >
+          Статистика
+        </button>
+        <button 
+          class="edit-btn" 
+          on:click={(e) => {
+            e.stopPropagation(); // Остановить всплытие события
+            editEvent(event.event_id);
+          }}
+        >
+          Редактировать
+        </button>
       </div>
     </div>
-    {/each}
+  {/each}
+{:else if error}
+  <p class="error">{error}</p>
+{:else}
+  <p>Загрузка мероприятий...</p>
+{/if}
+
+    </div>
   </div>
-</div>
 </div>
 
 <style>
   /* Глобальные стили для всей страницы */
   .app-container {
+    color: white;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     height: 100%;
-    padding: 20px;
-    background-color: #171615; /* Черный фон для всей страницы */
-    color: white;
-    font-family: "Inter", sans-serif;
+    padding: 0px;
+    background-image: url('/backgroundlkuser.png');
+    min-height: 100vh;
+    background-size: cover;
+    background-position: center кcenter;
   }
   
   .container {
@@ -138,7 +211,7 @@
   
   .logout-btn {
     margin-left: 20px;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
     background: transparent;
     border: 2px solid #444444;
     color: white;
@@ -222,13 +295,15 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #242423;
+    background: rgba(36, 36, 35, 0.8); /* Прозрачный фон */
     padding: 10px; /* Уменьшен отступ */
     border-radius: 15px; /* Уменьшено закругление */
     margin-bottom: 12px; /* Уменьшено расстояние */
     height: 60px; /* Уменьшена высота */
     width: 90%;
-    border: 1px solid #444444;
+    border: #838383 solid 1px;
+    cursor: pointer; /* Изменение курсора на указатель */
+
   }
   
   .event-name-panel {

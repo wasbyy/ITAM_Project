@@ -84,7 +84,6 @@
             <div>
                 {#if userInfo}
                     <div class="title">{userInfo.name}</div>
-                    <div class="subtitle">{userInfo.email}</div>
                 {:else if error}
                     <div class="error">{error}</div>
                 {:else}
@@ -124,20 +123,24 @@
             {:else if data.events.length === 0}
                 <p>Нет мероприятий</p>
             {:else}
-                {#each data.events as event}
-                    <div class="event">
-                        <div class="event-name-panel">
-                            <div class="event-name">{event.event_name}</div>
-                        </div>
-                        <div class="buttons">
-                            <button class="time-btn">{formatDateTime(event.date).formattedTime}</button>
-                            <button class="date-btn">{formatDateTime(event.date).formattedDate}</button>
-                        </div>
+            {#each data.events as event}
+                <!-- svelte-ignore a11y_no_static_element_interactions -->
+                <!-- svelte-ignore a11y_click_events_have_key_events -->
+                <div class="event" on:click={() => goto(`/event/${event.event_id}`)}>
+                    <div class="event-name-panel">
+                        <div class="event-name">{event.event_name}</div>
                     </div>
-                {/each}
+                    <div class="buttons">
+                        <button class="time-btn">{formatDateTime(event.date).formattedTime}</button>
+                        <button class="date-btn">{formatDateTime(event.date).formattedDate}</button>
+                    </div>
+                </div>
+            {/each}
+        
             {/if}
         </div>
     </div>
+    
 </div>
 
 <style>
@@ -200,19 +203,32 @@
   }
 
   .profile-image {
-    position: absolute;
-    width: 80px;
-    height: 75px;
-    border-radius: 50%; /* Идеальный круг */
-    background-image: url("/Profile.png"); /* Добавление изображения */
-    background-position: center; /* Центрирование изображения */
-    background-size: cover;
-    z-index: 2; /* Поверх свечения */
-    margin-top: 15px;
-  }
+  position: absolute;
+  width: 80px;
+  height: 75px;
+  border-radius: 50%; /* Идеальный круг */
+  background-image: url("/Profile.png"); /* Добавление изображения */
+  background-position: center; /* Центрирование изображения */
+  background-size: cover;
+  z-index: 2; /* Поверх свечения */
+  margin-top: 15px;
+  overflow: hidden; /* Чтобы затемнение не выходило за пределы круга */
+}
+
+.profile-image::after {
+  content: ''; /* Создаем пустой псевдоэлемент */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.2); /* Черный с прозрачностью для затемнения */
+  border-radius: 50%; /* Закругляем псевдоэлемент, чтобы он совпал с формой изображения */
+  z-index: 1; /* Находится ниже изображения */
+}
 
   .title {
-    font-size: 50px;
+    font-size: 60px;
     font-weight: bold;
     margin: 0;
     margin-left: 10px;
@@ -272,11 +288,12 @@
   }
 
   .event {
+    cursor: pointer; /* Изменение курсора на указатель при наведении на мероприятие */
     display: flex;
     justify-content: space-between;
     align-items: center;
     background: #242423;
-    padding: 15px; /* Уменьшен отступ */
+    padding: 10px; /* Уменьшен отступ */
     border-radius: 21px;
     margin-bottom: 17px; /* Уменьшено расстояние между панелями */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -353,7 +370,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px 30px; /* Внутренние отступы */
+    padding: 15px 25px; /* Внутренние отступы */
     font-size: 24px;
     font-weight: bold;
     color: white;
@@ -387,7 +404,7 @@
     mask-composite: exclude; /* То же самое для стандартных браузеров */
     z-index: -1; /* Позади панели */
   }
-  @media (max-width: 600px) {
+  @media (max-width: 480px) {
     /* Уменьшаем шрифт заголовков */
     .title {
     font-size: 48px; /* Уменьшен размер шрифта */
@@ -499,7 +516,7 @@
   }
   .logout-btn {
     margin-left: 20px;
-    margin-bottom: 30px;
+    margin-top: 15px;
     background: transparent;
     border: 2px solid #444444;
     color: white;
@@ -509,13 +526,14 @@
     cursor: pointer;
   }
 
+
   .logout-btn:hover {
     background: rgba(255, 255, 255, 0.1);
   }
   .logo{
     width: 100px;
     position: absolute;
-    right: 100px;
-    top: 40px;
+    right: 80px;
+    top: 60px;
   }
 </style>

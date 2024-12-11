@@ -57,7 +57,6 @@
     goto("/auntification/registration"); // Переход по маршруту
   };
 </script>
-
 <Icon id="logo" />
 
 <div class="page-container">
@@ -69,13 +68,12 @@
     <button class="register-text" on:click={goToRegistration}>
       Зарегистрироваться
     </button>
-      </div>
+  </div>
 </div>
 
 <style>
   /* Стили для общего контейнера */
   .page-container {
-    margin: -8px;
     padding: 0;
     font-family: "Inter", sans-serif;
     background-color: #171615; /* Темный фон */
@@ -84,12 +82,14 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
+    background-image: url("/authUser.png");
+    background-size: cover;
   }
 
   /* Стили для контейнера входа */
   .login-container {
     position: relative;
-    background: #1a1a1a;
+    background: rgba(26, 26, 26, 0.8); /* Прозрачный фон с 80% непрозрачности */
     border-radius: 20px;
     padding: 2rem;
     width: 400px;
@@ -98,33 +98,15 @@
     flex-direction: column;
     align-items: center;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6); /* Тень */
-    border: 2px solid #2ecc71; /* Обводка панели */
+    border: 2px solid #666666; /* Обводка панели */
   }
 
-  .login-container::before {
-    content: "";
-    position: absolute;
-    top: -3px;
-    left: -3px;
-    right: -3px;
-    bottom: -3px;
-    background: linear-gradient(135deg, #00ff00, #1db954, #00ff99, #2ecc71);
-    background-size: 300% 300%;
-    border-radius: 23px;
-    z-index: -1;
-    animation: greenGradient 3s ease infinite;
-  }
+
 
   @keyframes greenGradient {
-    0% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-    100% {
-      background-position: 0% 50%;
-    }
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
   }
 
   .login-container h1 {
@@ -153,96 +135,81 @@
     background: rgba(255, 255, 255, 0.2);
   }
 
+  /* Стили для кнопки Войти */
   .btn {
     position: relative;
-    background: linear-gradient(45deg, #00ff99, #1db954, #2ecc71, #00ff00dc);
-    background-size: 300% 300%;
+    background: transparent; /* Прозрачный фон */
+    color: white; /* Белый текст */
+    border: 2px solid rgb(203, 203, 203); /* Белая обводка */
     padding: 1rem 1.5rem;
-    color: white;
     border-radius: 20px;
     font-size: 1.1rem;
-    border: none;
     width: 50%;
-    animation: buttonGradient 3s linear infinite;
     transition: all 0.3s ease;
-    font-weight: 100;
-    font-size: 20px;
-    margin-top: 0%;
-  }
-
-  @keyframes buttonGradient {
-    0% {
-      background-position: 0% 0%;
-    }
-    50% {
-      background-position: 100% 100%;
-    }
-    100% {
-      background-position: 0% 0%;
-    }
+    font-weight: bold;
   }
 
   .btn:hover {
     transform: scale(1.05);
-    box-shadow: 0 6px 20px rgba(0, 255, 0, 0.5);
+    box-shadow: 0 2px 10px rgba(255, 255, 255, 0.3); /* Белая тень при наведении */
   }
 
   .btn:active {
     transform: scale(0.95);
-    box-shadow: 0 4px 10px rgba(0, 255, 0, 0.3);
+    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.3); /* Белая тень при клике */
   }
 
   .register-text {
-    margin-top: 1rem;
-    margin-bottom: -0.3rem;
+    margin-top: 0.7rem;
+    margin-bottom: -0.5rem;
     font-size: 0.9rem;
     color: #e0e0e0;
     cursor: pointer;
-    color: #01c47692;
+    color: #7826ca;
   }
 
   .register-text:hover {
-    color: #00ff99;
+    color: #8a29eb92;
   }
+
   .register-text {
-  background: none; /* Убирает фоновый цвет */
-  border: none; /* Убирает границы */
-  color: inherit; /* Наследует цвет текста от родителя */
-  font: inherit; /* Наследует шрифт от родителя */
-  cursor: pointer; /* Указывает, что элемент кликабельный */
-  padding: 0; /* Убирает внутренние отступы */
-  color: #2ecc71;
-}
+    background: none;
+    border: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    padding: 0;
+    color: #5e1da8
+  }
 
-.register-text:hover {
-  text-decoration: none; /* Убирает подчёркивание при наведении */
-}
+  .register-text:hover {
+    text-decoration: none;
+  }
 
-.register-text:focus {
-  outline: none; /* Убирает стандартный контур при фокусе */
-}
+  .register-text:focus {
+    outline: none;
+  }
 
   @media (max-width: 768px) {
-    /* Уменьшаем размеры контейнера и элементов */
     .login-container {
-      width: 80%; /* Уменьшаем ширину контейнера */
-      padding: 1.5rem; /* Уменьшаем отступы внутри */
+      width: 80%;
+      padding: 1.5rem;
     }
 
     .login-container h1 {
-      font-size: 1.5rem; /* Уменьшаем размер заголовка */
-      margin-top: 0; /* Убираем лишний отступ сверху */
-      margin-bottom: 1rem; /* Уменьшаем отступ снизу */
+      font-size: 1.5rem;
+      margin-top: 0;
+      margin-bottom: 1rem;
     }
 
     .login-container input {
-      padding: 0.8rem; /* Уменьшаем внутренний отступ */
-      font-size: 0.9rem; /* Уменьшаем размер шрифта */
+      padding: 0.8rem;
+      font-size: 0.9rem;
     }
 
     .btn {
-      padding: 0.8rem 1.2rem; /* Уменьшаем отступы на кнопке */
-      font-size: 1rem; /* Уменьшаем размер шрифта на кнопке */
+      padding: 0.8rem 1.2rem;
+      font-size: 1rem;
     }
   }
 </style>

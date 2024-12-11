@@ -198,7 +198,6 @@
     notificationMessage = "";
   }
 </script>
-
 <div class="icon"><Icon id="logo" /></div>
 
 {#if loading}
@@ -208,14 +207,12 @@
 {:else}
   <div class="page-background">
     <div class="event-page">
-      <div class="close-btn" on:click={() => goto("/")}>×</div> <!-- Крестик -->
+      <!-- svelte-ignore a11y_click_events_have_key_events -->
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <div class="close-btn" on:click={() => goto("/")}>×</div>
       <div class="header">
         {#if eventInfo.photo}
-          <img
-            src={eventInfo.photo}
-            alt="Фото мероприятия"
-            class="event-photo"
-          />
+          <img src={eventInfo.photo} alt="Фото мероприятия" class="event-photo" />
         {:else}
           <div class="event-photo">540x270 Placeholder</div>
         {/if}
@@ -236,14 +233,10 @@
       <div class="description">{eventInfo.description}</div>
 
       <div class="buttons">
-        <button class="register-btn" on:click={register}
-          >Зарегистрироваться</button
-        >
+        <button class="register-btn" on:click={register}>Зарегистрироваться</button>
 
         {#if eventInfo.onlineLink.trim() !== ""}
-          <button class="online-btn" on:click={joinOnline}
-            >Онлайн встреча</button
-          >
+          <button class="online-btn" on:click={joinOnline}>Онлайн встреча</button>
         {/if}
       </div>
     </div>
@@ -273,86 +266,85 @@
   }
 
   .event-page {
-    background-color: rgba(36, 36, 35, 0.6);
+    background-color: rgba(36, 36, 35, 0.8);
     color: white;
     padding: 30px;
-    width: 90%;
-    min-height: 50vh;
+    width: 85%;
+    min-height: 60vh;
     margin-top: 90px;
-    border-radius: 40px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    border-radius: 45px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
     position: relative;
     display: flex;
     flex-direction: column;
-    align-items: flex-start; /* Выравниваем все элементы по левому краю */
+    align-items: flex-start;
     border: 1px solid #838383;
   }
 
   .header {
     display: flex;
-    gap: 30px;
+    gap: 20px;
     margin-bottom: 30px;
-    align-items: flex-start;
-    flex-wrap: nowrap; /* Элементы не переносятся */
+    flex-wrap: nowrap;
     width: 100%;
-    justify-content: flex-start; /* Выравниваем блоки по левому краю */
+    justify-content: flex-start;
   }
 
   .event-photo {
-    width: 400px; /* Ширина изображения */
-    height: 400px; /* Высота изображения */
+    width: 350px;
+    height: 350px;
     object-fit: cover;
-    border-radius: 10px;
+    border-radius: 15px;
     background-color: #ccc;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #888;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: bold;
     text-align: center;
+  
   }
 
   .event-details {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    gap: 15px; /* Увеличен отступ между информацией */
+    gap: 10px;
     max-width: 600px;
-    margin-left: 30px; /* Отступ между фото и текстом */
-    text-align: left; /* Текст выравниваем по левому краю */
+    margin-left: 20px;
+    text-align: left;
   }
 
   .event-title {
-    font-size: 48px;
+    font-size: 40px;
     font-weight: bold;
     margin: 0;
-    margin-bottom: 20px; /* Уменьшен отступ снизу */
-    font-family: "Press Start 2P", monospace;
+    margin-bottom: 15px;
+    font-family: "Press Start 2P", monospace; /* Шрифт в стиле ретро */
   }
 
   .event-meta {
     display: flex;
-    gap: 20px;
-    font-size: 28px; /* Уменьшен шрифт для лучшего восприятия */
-    color: #888;
-    font-family: "Inter", sans-serif;
+    gap: 15px;
+    font-size: 24px;
+    color: #838383;
+    font-family: 'Inter', sans-serif;
   }
 
   .event-format,
   .event-participants {
-    font-size: 28px;
-    color: #888;
-    margin-bottom: 50px; /* Уменьшен отступ снизу */
-    font-family: "Inter", sans-serif;
+    font-size: 24px;
+    color: #838383;
+    margin-bottom: 40px;
+    font-family: 'Inter', sans-serif;
   }
 
   .description {
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(20, 20, 20, 0.685);
     border-radius: 8px;
     padding: 10px 15px;
-    font-size: 24px;
-    margin-top: 20px; /* Отступ сверху */
+    font-size: 28px;
     word-wrap: break-word;
     font-family: "Inter", sans-serif;
     max-height: none;
@@ -366,45 +358,44 @@
   .buttons {
     display: flex;
     justify-content: space-between;
-    margin-top: 30px; /* Увеличен отступ между описанием и кнопками */
+    margin-top: 30px;
     flex-wrap: wrap;
+    gap: 10px;
     width: 100%;
-    justify-content: space-between; /* Располагаем кнопки по бокам */
   }
 
+  
   .register-btn,
-.online-btn {
-  flex: 0 0 15%; /* Кнопки занимают по 15% ширины */
-  background-color: transparent; /* Прозрачный фон */
-  color: white; /* Белый текст */
-  border: 2px solid white; /* Белая обводка */
-  border-radius: 20px;
-  padding: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: 0.3s;
-  text-align: center;
-  font-family: "Inter", sans-serif;
-  margin: 5px 0;
-}
-
-.register-btn:hover,
-.online-btn:hover {
-  background-color: rgba(255, 255, 255, 0.2); /* Полупрозрачный белый фон при наведении */
-}
+  .online-btn {
+    background-color: transparent;
+    color: white;
+    border: 2px solid white;
+    border-radius: 25px;
+    padding: 15px 20px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    margin: 5px;
+  }
 
 
-  /* Уведомление */
+  .online-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+
   .notification {
     position: fixed;
     bottom: 20px;
-    left: 55px;
-    color: white;
+    left: 50%;
+    transform: translateX(-50%);
     padding: 20px;
     border-radius: 10px;
+    background-color: var(--notification-bg, #f44336);
+    color: white;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     font-size: 16px;
-    background-color: var(--notification-bg, #f44336);
   }
 
   .notification.success {
@@ -416,7 +407,6 @@
   }
 
   .notification button {
-    margin-top: 10px;
     background-color: #444;
     color: white;
     border: none;
@@ -430,8 +420,15 @@
     background-color: #666;
   }
 
-  /* Медиазапросы для мобильных устройств */
   @media (max-width: 768px) {
+    .event-page {
+      width: 80%;
+    }
+
+    .event-title {
+      font-size: 32px;
+    }
+
     .header {
       flex-direction: column;
       align-items: center;
@@ -439,112 +436,54 @@
     }
 
     .event-photo {
-      width: 100%; /* Изображение будет занимать всю ширину экрана */
-      height: auto; /* Сохраняем пропорции */
+      width: 100%;
+      height: auto;
       margin-bottom: 20px;
     }
 
     .event-details {
-      width: 100%; /* Контент будет занимать всю ширину */
-      text-align: center; /* Выравниваем текст по центру */
-    }
-
-    .event-title {
-      font-size: 36px; /* Уменьшаем размер шрифта на мобильных устройствах */
+      width: 100%;
+      text-align: center;
+      margin: 0;
     }
 
     .event-meta {
-      font-size: 20px;
-      gap: 20px;
+      flex-direction: column;
+      gap: 15px;
       text-align: center;
     }
 
-    .event-format,
-    .event-participants {
-      font-size: 20px;
-    }
-
     .description {
-      font-size: 18px;
-      word-wrap: break-word;
+      width: 95%;
+      font-size: 20px;
     }
 
     .buttons {
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 10px;
     }
 
     .register-btn,
     .online-btn {
-      width: 90%; /* Кнопки занимают 90% ширины экрана */
+      width: 90%;
       font-size: 14px;
       margin: 10px 0;
     }
   }
 
-  /* Медиазапросы для планшетов */
-  @media (max-width: 1024px) {
-    .event-photo {
-      width: 300px;
-      height: 300px;
-    }
-
-    .event-title {
-      font-size: 42px;
-    }
-
-    .event-meta {
-      flex-direction: column; /* На мобильных устройствах мы меняем направление на вертикальное */
-      align-items: center; /* Выравнивание по центру по оси X */
-      font-size: 24px; /* Уменьшаем шрифт для мобильных устройств */
-      gap: 10px; /* Уменьшаем расстояние между элементами */
-    }
-
-    .event-format,
-    .event-participants {
-      font-size: 26px;
-    }
+  .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 36px;
+    color: rgba(135, 135, 135, 1);
+    cursor: pointer;
+    font-weight: bold;
   }
 
-  .event-title {
-    font-size: clamp(
-      24px,
-      6vw,
-      48px
-    ); /* Размер шрифта будет от 24px до 48px, и динамически изменяться в зависимости от ширины экрана */
+  .close-btn:hover {
+    color: #ffffff;
   }
-
-  .event-meta {
-    font-size: clamp(
-      14px,
-      3vw,
-      32px
-    ); /* Шрифт будет адаптироваться между 14px и 32px */
-  }
-
-  .event-format,
-  .event-participants {
-    font-size: clamp(
-      16px,
-      3vw,
-      32px
-    ); /* Для формата и участников тоже динамическое изменение */
-  }
-  /* Стили для крестика */
-.close-btn {
-  position: absolute;
-  top: 10px;
-  right: 20px;
-  font-size: 36px;
-  color: rgba(135, 135, 135, 1);
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.close-btn:hover {
-  color: #ffffff;
-}
-
 </style>
+
