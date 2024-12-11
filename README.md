@@ -2,9 +2,13 @@
 Проект в рамках курсов ITAM
 
 Состав команды Mojarung:
-Backend: @dontpaniczy
-Frontend: @Wasbyy
-Design: @aantaars, @thePolishaz3, @kisssssssik
+
+Backend: 
+@dontpaniczy
+Frontend: 
+@Wasbyy
+Design: 
+@aantaars, @thePolishaz3, @kisssssssik
 
 Реализованный функционал/фичи:
 Backend:
