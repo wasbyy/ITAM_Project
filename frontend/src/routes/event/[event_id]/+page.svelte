@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { goto } from "$app/navigation"; // Добавлено
   import { page } from "$app/stores";
   import Icon from "$lib/components/Icon.svelte";
   import { BASE_URL } from "../../../config";
@@ -207,6 +208,7 @@
 {:else}
   <div class="page-background">
     <div class="event-page">
+      <div class="close-btn" on:click={() => goto("/")}>×</div> <!-- Крестик -->
       <div class="header">
         {#if eventInfo.photo}
           <img
@@ -260,7 +262,6 @@
     background-color: #171615;
     background-image: url("/eventbackground.png");
     background-size: cover;
-    background-position: center center;
     min-height: 100vh;
     width: 100%;
     display: flex;
@@ -272,19 +273,19 @@
   }
 
   .event-page {
-    background-color: rgba(36, 36, 35, 0.9);
+    background-color: rgba(36, 36, 35, 0.6);
     color: white;
     padding: 30px;
-    max-width: 1200px;
-    width: 100%;
+    width: 90%;
     min-height: 50vh;
     margin-top: 90px;
-    border-radius: 15px;
+    border-radius: 40px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: flex-start; /* Выравниваем все элементы по левому краю */
+    border: 1px solid #838383;
   }
 
   .header {
@@ -372,32 +373,26 @@
   }
 
   .register-btn,
-  .online-btn {
-    flex: 0 0 15%; /* Кнопки занимают по 45% ширины */
-    background-color: #fb607f;
-    color: white;
-    border: none;
-    border-radius: 20px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: 0.3s;
-    text-align: center;
-    font-family: "Inter", sans-serif;
-    margin: 5px 0;
-  }
+.online-btn {
+  flex: 0 0 15%; /* Кнопки занимают по 15% ширины */
+  background-color: transparent; /* Прозрачный фон */
+  color: white; /* Белый текст */
+  border: 2px solid white; /* Белая обводка */
+  border-radius: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+  text-align: center;
+  font-family: "Inter", sans-serif;
+  margin: 5px 0;
+}
 
-  .register-btn:hover {
-    background-color: #ff4c4c;
-  }
+.register-btn:hover,
+.online-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2); /* Полупрозрачный белый фон при наведении */
+}
 
-  .online-btn {
-    background-color: #fb8967;
-  }
-
-  .online-btn:hover {
-    background-color: #ff893c;
-  }
 
   /* Уведомление */
   .notification {
@@ -537,4 +532,19 @@
       32px
     ); /* Для формата и участников тоже динамическое изменение */
   }
+  /* Стили для крестика */
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-size: 36px;
+  color: rgba(135, 135, 135, 1);
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.close-btn:hover {
+  color: #ffffff;
+}
+
 </style>

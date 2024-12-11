@@ -11,6 +11,7 @@
     place: string;
     tags: string;
     image_url?: string;
+    date: string;
   }
 
   let events: Event[] = [];
@@ -111,8 +112,7 @@
               <p>{event.short_description}</p>
               <div class="details">
                 <span>{event.place}</span>
-                <span>{event.event_id}</span>
-                <span>{new Date().toLocaleDateString()}</span>
+                <span>{new Date(event.date).toLocaleDateString()}</span>              
               </div>
             </div>
             <div class="tags">
@@ -148,17 +148,19 @@
   }
 
   /* Фон для страницы */
-  .background {
-    position: absolute; /* Абсолютное позиционирование для фонового изображения */
-    top: 0; /* Прикрепляем к верхней части */
-    left: 0; /* Прикрепляем к левой части */
-    width: 100%; /* Задаем ширину на весь экран */
-    height: 100%; /* Задаем высоту на весь экран */
-    background: url("/background.png");
-    background-size: cover;
-    filter: brightness(1.1); /* Немного увеличиваем яркость фона */
-    z-index: 0; /* Фон будет находиться позади всех остальных элементов */
-  }
+/* Фон для страницы */
+.background {
+  position: absolute; /* Абсолютное позиционирование для фонового изображения */
+  top: 0; /* Прикрепляем к верхней части */
+  left: 0; /* Прикрепляем к левой части */
+  width: 100%; /* Задаем ширину на весь экран */
+  height:100%; /* Минимальная высота — 100% от высоты экрана, чтобы фон не обрезался */
+  background: url("/background.png");
+  background-size: cover;
+  filter: brightness(1.1); /* Немного увеличиваем яркость фона */
+  z-index: 0; /* Фон будет находиться позади всех остальных элементов */
+}
+
 
   /* Панель сверху страницы с логотипом и кнопкой "Вход" */
   /* Добавим стили для кнопки и иконки */
@@ -213,7 +215,7 @@
 
   /* Кнопка для входа */
   .login-btn {
-    margin-right: 2rem; /* Отступ справа */
+    margin-right: 3rem; /* Отступ справа */
     margin-top: 0.4rem; /* Отступ сверху */
     border: 2px solid white; /* Белая рамка */
     padding: 5px 15px; /* Отступы внутри кнопки */
@@ -250,6 +252,9 @@
     justify-content: center; /* Центрируем содержимое по горизонтали */
     background-image: url(/backgroundBottom.png);
     background-size: cover;
+    
+    
+
     
   }
 
@@ -350,7 +355,8 @@
   /* Стили для каждого тега */
   .event-card .tags .tag {
     font-size: 12px; /* Размер шрифта тегов */
-    color: #f4a261; /* Оранжевый цвет для тегов */
+    
+    color: #c4c4c4; /* Оранжевый цвет для тегов */
     background: #333; /* Темный фон для тегов */
     padding: 5px 10px; /* Отступы внутри тега */
     border-radius: 20px; /* Скругленные углы */
@@ -361,7 +367,7 @@
 
   /* Эффект при наведении на тег */
   .event-card .tags .tag:hover {
-    background: #f4a261; /* Изменение фона при наведении */
+    background: #797979; /* Изменение фона при наведении */
     color: #252525; /* Цвет текста при наведении */
   }
   .profile-btn {

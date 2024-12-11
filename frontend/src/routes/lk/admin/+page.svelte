@@ -82,17 +82,18 @@
 </div>
 </div>
 
-<style>/* Глобальные стили для всей страницы */
-.app-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        height: 100%;
-        padding: 20px;
-        background-color: #171615; /* Черный фон для всей страницы */
-        color: white;
-        font-family: "Inter", sans-serif;
-    }
+<style>
+  /* Глобальные стили для всей страницы */
+  .app-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    height: 100%;
+    padding: 20px;
+    background-color: #171615; /* Черный фон для всей страницы */
+    color: white;
+    font-family: "Inter", sans-serif;
+  }
   
   .container {
     display: flex;
@@ -111,30 +112,46 @@
   }
   
   .profile-icon {
-    width: 105px;
-    height: 105px;
-    border-radius: 50px;
-    background-image: url('/Profile.png'); /* Добавление изображения */
-    background-position: center; /* Центрирование изображения */
-    margin-right: 15px;
-    margin-top: 5px;
-    box-shadow: 0 0 15px 5px rgba(1, 199, 232, 0.4), 0 0 30px 10px rgba(79, 189, 46, 0.4); /* Градиентное свечение */
+    width: 80px; /* Уменьшен размер */
+    height: 80px; /* Уменьшен размер */
+    border-radius: 40px;
+    background-image: url('/Profile.png');
+    background-size: contain;
+    background-position: center;
+    margin-right: 10px;
+    box-shadow: 0 0 10px 3px rgba(1, 199, 232, 0.4), 0 0 20px 7px rgba(79, 189, 46, 0.4);
   }
   
   .title {
-    font-size: 64px;
+    font-size: 48px; /* Уменьшен размер шрифта */
     font-weight: bold;
     margin: 0;
-    margin-left: 38px;
+    margin-left: 25px;
   }
   
   .subtitle {
-    font-size: 32px;
+    font-size: 24px; /* Уменьшен размер шрифта */
     color: #888;
     margin: 0;
-    margin-left: 38px;
+    margin-left: 25px;
   }
   
+  .logout-btn {
+    margin-left: 20px;
+    margin-bottom: 30px;
+    background: transparent;
+    border: 2px solid #444444;
+    color: white;
+    padding: 8px 18px;
+    font-size: 20px;
+    border-radius: 30px;
+    cursor: pointer;
+  }
+  
+  .logout-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
   .events-list {
     flex-grow: 1;
     margin-top: 20px;
@@ -154,7 +171,7 @@
   }
   
   .events-header h2 {
-    font-size: 48px;
+    font-size: 36px; /* Уменьшен размер шрифта */
     font-weight: bold;
     color: white;
     margin-bottom: 10px;
@@ -163,15 +180,16 @@
   .buttons-right {
     display: flex;
     gap: 10px;
-    margin-top: 15px;
+    margin-top: 5px;
+    height: 45px;
   }
   
   .archive-btn {
     background: transparent; /* Прозрачный фон */
     color: white; /* Белый текст */
     text-align: center;
-    padding: 10px 50px;
-    font-size: 24px;
+    padding: 5px 35px;
+    font-size: 20px;
     font-weight: 100;
     border: 2px solid #444444; /* Белый контур */
     border-radius: 40px; /* Овальная форма */
@@ -193,7 +211,7 @@
     justify-content: center;
     cursor: pointer;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-    border: white ;
+    border: white;
   }
   
   .create-btn:hover {
@@ -205,21 +223,20 @@
     justify-content: space-between;
     align-items: center;
     background: #242423;
-    padding: 15px; /* Уменьшен отступ */
-    border-radius: 21px;
-    margin-bottom: 12px; /* Уменьшено расстояние между панелями */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    height: 80px; /* Уменьшена высота */
+    padding: 10px; /* Уменьшен отступ */
+    border-radius: 15px; /* Уменьшено закругление */
+    margin-bottom: 12px; /* Уменьшено расстояние */
+    height: 60px; /* Уменьшена высота */
     width: 90%;
-    border: #444444 solid;
+    border: 1px solid #444444;
   }
   
   .event-name-panel {
     background-color: #171615;
     width: 50%;
-    height: 75%; /* Высота на всю панель мероприятия */
-    padding: 8px 15px; /* Уменьшен внутренний отступ */
-    border-radius: 21px;
+    height: 80%; /* Уменьшена высота панели */
+    padding: 5px 10px; /* Уменьшен внутренний отступ */
+    border-radius: 15px;
     display: flex;
     justify-content: flex-start;
     align-items: center;
@@ -227,7 +244,7 @@
   }
   
   .event-name {
-    font-size: 28px; /* Уменьшен размер шрифта */
+    font-size: 20px; /* Уменьшен размер шрифта */
     font-weight: normal;
     color: white;
     word-wrap: break-word; /* Перенос длинных слов */
@@ -236,12 +253,12 @@
   
   .buttons {
     display: flex;
-    gap: 26px; /* Уменьшено расстояние между кнопками */
+    gap: 15px; /* Уменьшено расстояние между кнопками */
   }
   
   button {
-    padding: 15px 17px; /* Уменьшены внутренние отступы кнопок */
-    font-size: 20px; /* Уменьшен размер шрифта кнопок */
+    padding: 10px 12px; /* Уменьшены внутренние отступы */
+    font-size: 16px; /* Уменьшен размер шрифта кнопок */
     border: 2px solid white;
     background: transparent;
     color: white;
@@ -260,7 +277,7 @@
   .logo {
     position: absolute;
     top: 50px;
-    right: 80px;
+    right: 100px;
     width: 100px; /* Размер логотипа */
     height: auto;
     cursor: pointer;
@@ -270,128 +287,62 @@
   /* Адаптивные стили для мобильных устройств */
   @media (max-width: 768px) {
     .logo {
-    position: absolute;
-    top: 20px;
-    right: 40px;
-    
-  }
-    /* Заголовки */
+      position: absolute;
+      top: 20px;
+      right: 40px;
+    }
     .title {
-      font-size: 40px;
+      font-size: 36px; /* Для мобильных устройств */
     }
-  
     .subtitle {
-      font-size: 24px;
-    }
-  
-    .events-header h2 {
-      font-size: 36px;
-    }
-  
-    /* Стили для кнопок */
-    .archive-btn {
       font-size: 20px;
-      padding: 8px 30px;
     }
-  
-    .create-btn {
-      font-size: 24px;
-      padding: 8px 30px;
+    .profile-icon {
+      width: 60px; /* Уменьшен для мобильных */
+      height: 60px;
     }
-  
-    /* Уменьшение размеров панели мероприятий */
+    .events-header h2 {
+      font-size: 30px;
+    }
     .event {
-      padding: 12px;
-      height: 70px;
-      margin-bottom: 10px;
+      height: 50px;
     }
-  
     .event-name {
-      font-size: 22px;
-    }
-  
-    .event-name-panel {
-      padding: 5px 12px;
-    }
-  
-    .buttons {
-      gap: 12px;
-    }
-  
-    button {
-      padding: 12px 15px;
       font-size: 16px;
+    }
+    .buttons {
+      gap: 10px;
+    }
+    button {
+      font-size: 14px;
+      padding: 8px 10px;
     }
   }
   
   @media (max-width: 480px) {
-    /* Уменьшаем размер шрифта и расстояния для самых маленьких экранов */
     .title {
-      font-size: 32px;
-      margin-top: 80px;
-    }
-    .profile-icon {
-    margin-top: 70px;
-    width: 60px;
-    height: 50px;
-    background-size: cover;
-  }
-  
-    .subtitle {
-      font-size: 20px;
-    }
-  
-    .events-header h2 {
       font-size: 24px;
     }
-  
-    .archive-btn {
-      font-size: 14px;
-      padding: 8px 15px;
-      margin-left: 10px;
+    .subtitle {
+      font-size: 16px;
     }
-  
-    .create-btn {
-      font-size: 14px;
-      padding: 10px 10px;
+    .profile-icon {
+      width: 50px;
+      height: 50px;
     }
-  
     .event {
-      padding: 10px;
-      height: 60px;
-      margin-bottom: 8px;
+      height: 40px;
     }
-  
     .event-name {
-      font-size: 14px;
+      font-size: 12px;
     }
-  
-    .event-name-panel {
-      padding: 5px 10px;
-    }
-  
     .buttons {
       gap: 8px;
     }
-  
     button {
-      padding: 7px 10px;
-      font-size: 10px;
+      font-size: 12px;
+      padding: 8px 10px;
     }
   }
-  .logout-btn {
-    margin-left: 20px;
-    margin-bottom: 30px;
-    background: transparent;
-    border: 2px solid #444444;
-    color: white;
-    padding: 8px 18px;
-    font-size: 20px;
-    border-radius: 30px;
-    cursor: pointer;
-  }
-
-  .logout-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-  }
 </style>
+

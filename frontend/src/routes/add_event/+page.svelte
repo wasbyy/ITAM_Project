@@ -164,6 +164,9 @@
         align-items: center;
         padding: 20px;
         box-sizing: border-box;
+        background-image: url('/createevent.png');
+        background-size: cover;
+        background-position: center center;
     }
 
     h1 {
@@ -180,18 +183,19 @@
     }
 
     .container {
-        width: 90%;
-        max-width: 1200px;
-        padding: 20px;
-        background-color: #242423;
-        border-radius: 40px;
-        color: white;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-        border: 1.3px solid rgba(255, 255, 255, 0.473);
-    }
+    width: 90%;
+    max-width: 1200px;
+    padding: 20px;
+    background-color: rgba(36, 36, 35, 0.6); /* Фон с прозрачностью 80% */
+    border-radius: 40px;
+    color: white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Прозрачность тени */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    border: 1.3px solid rgba(255, 255, 255, 0.473); /* Полупрозрачная граница */
+}
+
 
     .form {
         display: flex;

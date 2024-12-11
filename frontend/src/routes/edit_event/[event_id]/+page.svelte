@@ -221,13 +221,15 @@
   .page-background {
     background-color: #171615;
     width: 100vw;
-    height: auto;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 20px;
     box-sizing: border-box;
+    background-image: url("/editevent.png");
+    background-size: cover;
+    background-position: center center;
   }
 
   h1 {
@@ -243,7 +245,7 @@
   .container {
     width: 90%;
     padding: 15px;
-    background-color: #242423;
+    background-color: rgba(36, 36, 35, 0.5); /* Установите прозрачность 60% */
     border-radius: 40px;
     color: white;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
@@ -251,7 +253,8 @@
     flex-direction: column;
     gap: 40px;
     border: 1.3px solid rgba(255, 255, 255, 0.473);
-  }
+}
+
 
   .form {
     display: flex;

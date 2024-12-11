@@ -1,122 +1,148 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import { goto } from "$app/navigation";
-  import { BASE_URL } from "../../../config";
-  import Icon from "$lib/components/Icon.svelte";
-  import { eraseCookie, getCookie } from "$lib/utils/utilCookie";
-  import { formatDateTime } from "$lib/utils/utilTime";
-
-  type Event = {
-    event_id: number;
-    event_name: string;
-    date: string;
-  };
-
-  export let data: { events: Event[]; error?: string; loading?: boolean };
-
-  let error: string | null = null;
-
-  const authToken = getCookie("auth_token");
-
-  // async function loadUserEvents() {
-  //   try {
-  //     const response = await fetch(`${BASE_URL}/user_events`, {
-  //       method: "GET",
-  //       headers: {
-  //         Authorization: `${authToken}`,
-  //         "Content-Type": "application/json",
-  //       },
-  //     });
-  //     if (!response.ok) {
-  //       throw new Error("Ошибка при загрузке мероприятий");
-  //     }
-  //     const data: Event[] = await response.json();
-  //     events = data;
-  //   } catch (err) {
-  //     error = err instanceof Error ? err.message : "Неизвестная ошибка";
-  //   } finally {
-  //     loading = false;
-  //   }
-  // }
-
-  function logout(): void {
-    eraseCookie("auth_token");
-    goto("/");
-  }
-
-  function goToArchive(): void {
-    if (authToken) {
-      goto(`/archieve/user/`);
-    } else {
-      goto("/");
-      console.error("Токен не найден");
+    import { onMount } from "svelte";
+    import { goto } from "$app/navigation";
+    import { BASE_URL } from "../../../config";
+    import Icon from "$lib/components/Icon.svelte";
+    import { eraseCookie, getCookie } from "$lib/utils/utilCookie";
+    import { formatDateTime } from "$lib/utils/utilTime";
+  
+    type Event = {
+      event_id: number;
+      event_name: string;
+      date: string;
+    };
+  
+    type UserInfo = {
+      user_id: number;
+      name: string;
+      email: string;
+      telephone_number: string;
+      course: number;
+      university_group: string;
+    };
+  
+    export let data: { events: Event[]; error?: string; loading?: boolean };
+  
+    let userInfo: UserInfo | null = null;
+    let error: string | null = null;
+  
+    const authToken = getCookie("auth_token");
+  
+    async function fetchUserInfo() {
+      if (!authToken) {
+        error = "Токен аутентификации не найден";
+        return;
+      }
+  
+      try {
+        const response = await fetch(`${BASE_URL}/users_info`, {
+          method: "GET",
+          headers: {
+            Authorization: `${authToken}`,
+            "Content-Type": "application/json",
+          },
+        });
+  
+        if (!response.ok) {
+          const { message } = await response.json();
+          throw new Error(message || "Не удалось получить данные пользователя");
+        }
+  
+        userInfo = await response.json(); // Сохраняем полученные данные
+      } catch (err) {
+        error = err.message || "Произошла ошибка при получении данных";
+      }
     }
-  }
-
-  // Загрузка мероприятий при монтировании компонента
-  // onMount(loadUserEvents);
-</script>
-
-<Icon id="logo" left={false} />
-<div class="container">
-  <!-- Header -->
-  <div class="header">
-    <div class="profile-container">
-      <div class="profile-glow"></div>
-      <div class="profile-image"></div>
-    </div>
-    <div>
-      <div class="title">Имя Пользователя</div>
-      <div class="subtitle">Почта</div>
-    </div>
-    <!-- Кнопка выхода -->
-    <button class="logout-btn" on:click={logout}>Выйти</button>
-  </div>
-
-  <!-- Новый раздел "Данные" -->
-  <div class="data-section">
-    <h2>Данные</h2>
-    <div class="data-panels">
-      <div class="data-panel">+7 (xxx) xxx-xx-xx</div>
-      <div class="data-panel">pochtapolizov@pochta.com</div>
-      <div class="data-panel">N курс БХХХ - N - N</div>
-    </div>
-  </div>
-
-  <!-- Events Section -->
-  <div class="events-list">
-    <div class="events-header">
-      <h2>МЕРОПРИЯТИЯ</h2>
-      <button class="archive-btn" on:click={goToArchive}>АРХИВ</button>
-    </div>
-
-    {#if data.loading}
-      <p>Загрузка мероприятий...</p>
-    {:else if data.error}
-      <p class="error">Ошибка: {error}</p>
-    {:else if data.events.length === 0}
-      <p>Нет мероприятий</p>
-    {:else}
-      {#each data.events as event}
-        <div class="event">
-          <div class="event-name-panel">
-            <div class="event-name">{event.event_name}</div>
-          </div>
-          <div class="buttons">
-            <div class="buttons">
-              <button class="time-btn">{formatDateTime(event.date).formattedTime}</button>
-              <button class="date-btn">{formatDateTime(event.date).formattedDate}</button>
+  
+    function logout(): void {
+      eraseCookie("auth_token");
+      goto("/");
+    }
+  
+    function goToArchive(): void {
+      if (authToken) {
+        goto(`/archieve/user/`);
+      } else {
+        goto("/");
+        console.error("Токен не найден");
+      }
+    }
+  
+    onMount(fetchUserInfo); // Получаем данные пользователя при монтировании компонента
+  </script>
+  
+  <div class="global-container">
+    <div class="container">
+        <a href="/">
+            <img src="/itam_logo.png" alt="Логотип" class="logo" />
+        </a>
+        <div class="header">
+            <div class="profile-container">
+                <div class="profile-glow"></div>
+                <div class="profile-image"></div>
             </div>
-          </div>
+            <div>
+                {#if userInfo}
+                    <div class="title">{userInfo.name}</div>
+                    <div class="subtitle">{userInfo.email}</div>
+                {:else if error}
+                    <div class="error">{error}</div>
+                {:else}
+                    <div class="title">Загрузка...</div>
+                    <div class="subtitle">Пожалуйста, подождите</div>
+                {/if}
+            </div>
+            <!-- Кнопка выхода -->
+            <button class="logout-btn" on:click={logout}>Выйти</button>
         </div>
-      {/each}
-    {/if}
-  </div>
+
+        <!-- Новый раздел "Данные" -->
+        <div class="data-section">
+            <h2>Данные</h2>
+            <div class="data-panels">
+                {#if userInfo}
+                    <div class="data-panel">{userInfo.telephone_number}</div>
+                    <div class="data-panel">{userInfo.email}</div>
+                    <div class="data-panel">{userInfo.course} курс {userInfo.university_group}</div>
+                {:else}
+                    <div class="data-panel">Загрузка данных...</div>
+                {/if}
+            </div>
+        </div>
+
+        <!-- Events Section -->
+        <div class="events-list">
+            <div class="events-header">
+                <h2>МЕРОПРИЯТИЯ</h2>
+                <button class="archive-btn" on:click={goToArchive}>АРХИВ</button>
+            </div>
+
+            {#if data.loading}
+                <p>Загрузка мероприятий...</p>
+            {:else if data.error}
+                <p class="error">Ошибка: {data.error}</p>
+            {:else if data.events.length === 0}
+                <p>Нет мероприятий</p>
+            {:else}
+                {#each data.events as event}
+                    <div class="event">
+                        <div class="event-name-panel">
+                            <div class="event-name">{event.event_name}</div>
+                        </div>
+                        <div class="buttons">
+                            <button class="time-btn">{formatDateTime(event.date).formattedTime}</button>
+                            <button class="date-btn">{formatDateTime(event.date).formattedDate}</button>
+                        </div>
+                    </div>
+                {/each}
+            {/if}
+        </div>
+    </div>
 </div>
 
 <style>
-  /* Глобальные стили для всей страницы */
-  :global(html, body) {
+  /* Стили для глобального контейнера */
+  .global-container {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -124,6 +150,10 @@
     background-color: #171615; /* Черный фон для всей страницы */
     color: white;
     font-family: "Inter", sans-serif;
+    background-image: url('/backgroundlkuser.png');
+    min-height: 100vh;
+    background-size: cover;
+    background-position: center кcenter;
   }
 
   .container {
@@ -133,7 +163,6 @@
     height: 100%;
     padding: 20px;
   }
-
   .header {
     display: flex;
     align-items: center;
@@ -152,8 +181,8 @@
     position: absolute;
     top: 1px;
     left: 2px;
-    width: 95%;
-    height: 95%;
+    width: 70%;
+    height: 70%;
     border-radius: 50%; /* Идеальный круг */
     box-shadow:
       inset 0 0 25px rgba(255, 255, 255, 0.7),
@@ -166,31 +195,34 @@
       8px 0 15px rgba(108, 162, 251, 0.6),
       0px 0 20px rgba(154, 139, 240, 0.6);
     z-index: 1; /* Под иконкой профиля */
+    margin-top: 15px;
+
   }
 
   .profile-image {
     position: absolute;
-    width: 105px;
-    height: 105px;
+    width: 80px;
+    height: 75px;
     border-radius: 50%; /* Идеальный круг */
     background-image: url("/Profile.png"); /* Добавление изображения */
     background-position: center; /* Центрирование изображения */
     background-size: cover;
     z-index: 2; /* Поверх свечения */
+    margin-top: 15px;
   }
 
   .title {
-    font-size: 64px;
+    font-size: 50px;
     font-weight: bold;
     margin: 0;
-    margin-left: 38px;
+    margin-left: 10px;
   }
 
   .subtitle {
-    font-size: 32px;
+    font-size: 28px;
     color: #888;
     margin: 0;
-    margin-left: 38px;
+    margin-left: 18px;
   }
 
   .events-list {
@@ -211,7 +243,7 @@
   }
 
   .events-header h2 {
-    font-size: 48px;
+    font-size: 36px;
     font-weight: bold;
     color: white;
     margin-bottom: 10px;
@@ -222,9 +254,9 @@
     color: white; /* Белый текст */
     text-align: center;
     padding: 10px 50px;
-    font-size: 24px;
+    font-size: 22px;
     font-weight: bolder;
-    border: 2px solid #444444; /* Белый контур */
+    border: 2px solid #636363; /* Белый контур */
     border-radius: 40px; /* Овальная форма */
     cursor: pointer;
     text-decoration: none; /* Убираем подчеркивание */
@@ -246,11 +278,15 @@
     background: #242423;
     padding: 15px; /* Уменьшен отступ */
     border-radius: 21px;
-    margin-bottom: 12px; /* Уменьшено расстояние между панелями */
+    margin-bottom: 17px; /* Уменьшено расстояние между панелями */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    height: 80px; /* Уменьшена высота */
+    height: 60px; /* Уменьшена высота */
     width: 90%;
     border: #444444 solid;
+    background: rgba(36, 36, 35, 0.8); /* Прозрачный фон */
+    border: #838383 solid 1px;
+
+
   }
 
   .event-name-panel {
@@ -265,7 +301,7 @@
   }
 
   .event-name {
-    font-size: 28px; /* Уменьшен размер шрифта */
+    font-size: 24px; /* Уменьшен размер шрифта */
     font-weight: normal;
     color: white;
   }
@@ -276,8 +312,8 @@
   }
 
   button {
-    padding: 15px 17px; /* Уменьшен внутренний отступ кнопок */
-    font-size: 20px; /* Уменьшен размер шрифта кнопок */
+    padding: 10px 17px; /* Уменьшен внутренний отступ кнопок */
+    font-size: 18px; /* Уменьшен размер шрифта кнопок */
     border: 2px solid white;
     background: transparent;
     color: white;
@@ -301,7 +337,7 @@
   }
 
   .data-section h2 {
-    font-size: 32px;
+    font-size: 30px;
     font-weight: bold;
     margin-bottom: 20px;
   }
@@ -354,16 +390,25 @@
   @media (max-width: 600px) {
     /* Уменьшаем шрифт заголовков */
     .title {
-      font-size: 32px;
-    }
+    font-size: 48px; /* Уменьшен размер шрифта */
+    font-weight: bold;
+    margin: 0;
+    margin-left: 25px;
+  }
+  
+  .subtitle {
+    font-size: 24px; /* Уменьшен размер шрифта */
+    color: #888;
+    margin: 0;
+    margin-left: 25px;
+  }
 
-    .subtitle {
-      font-size: 18px;
-    }
-
-    .events-header h2 {
-      font-size: 24px;
-    }
+  .events-header h2 {
+    font-size: 36px; /* Уменьшен размер шрифта */
+    font-weight: bold;
+    color: white;
+    margin-bottom: 10px;
+  }
 
     .event-name {
       font-size: 18px;
@@ -376,17 +421,29 @@
     }
 
     .event {
-      flex-direction: column; /* Ставим элементы в колонку */
-      height: auto;
-      padding: 10px;
-    }
-
-    .event-name-panel {
-      width: 100%; /* Панель события на всю ширину */
-      height: auto;
-      padding: 5px 10px;
-      margin-bottom: 5px;
-    }
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #242423;
+    padding: 5px; /* Уменьшен отступ */
+    border-radius: 15px; /* Уменьшено закругление */
+    margin-bottom: 12px; /* Уменьшено расстояние */
+    height: 60px; /* Уменьшена высота */
+    width: 90%;
+    border: 1px solid #444444;
+  }
+  
+  .event-name-panel {
+    background-color: #171615;
+    width: 50%;
+    height: 40%; /* Уменьшена высота панели */
+    padding: 5px 50px; /* Уменьшен внутренний отступ */
+    border-radius: 15px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    overflow: hidden;
+  }
 
     .buttons {
       flex-direction: row; /* Кнопки вертикально */
@@ -441,7 +498,7 @@
     }
   }
   .logout-btn {
-    margin-left: 10px;
+    margin-left: 20px;
     margin-bottom: 30px;
     background: transparent;
     border: 2px solid #444444;
@@ -454,5 +511,11 @@
 
   .logout-btn:hover {
     background: rgba(255, 255, 255, 0.1);
+  }
+  .logo{
+    width: 100px;
+    position: absolute;
+    right: 100px;
+    top: 40px;
   }
 </style>
