@@ -5,8 +5,10 @@
 
 Backend: 
 @dontpaniczy
+
 Frontend: 
 @Wasbyy
+
 Design: 
 @aantaars, @thePolishaz3, @kisssssssik
 
