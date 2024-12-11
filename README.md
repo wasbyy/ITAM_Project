@@ -12,6 +12,7 @@ Frontend:
 Design: 
 @aantaars, @thePolishaz3, @kisssssssik
 
+
 Реализованный функционал/фичи:
 Backend:
 1. Главная страница: 
