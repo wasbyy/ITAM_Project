@@ -202,6 +202,8 @@
     <h1>Завершенные мероприятия</h1>
     <div class="grid">
         {#each events as event}
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div class="card" on:click={() => handleEventClick(event.event_id)}>
                 <img src={event.image} alt={event.event_name} />
                 <div class="card-title">{event.event_name}</div>

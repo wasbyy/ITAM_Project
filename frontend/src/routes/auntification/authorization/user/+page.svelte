@@ -2,14 +2,19 @@
   import { goto } from "$app/navigation"; // Импортируем функцию goto
   import Icon from "$lib/components/Icon.svelte";
   import { setCookie } from "$lib/utils/utilCookie";
+
+  // Типизация переменных
   let username: string = "";
   let password: string = "";
   let isLoading: boolean = false;  // Состояние загрузки
   let errorMessage: string | null = null;  // Состояние для ошибок
+
   import { BASE_URL } from "../../../../config";
 
-  const handleLogin = async () => {
+  // Типизация для функции handleLogin
+  const handleLogin = async (): Promise<void> => {
     errorMessage = null;  // Сбрасываем ошибку перед новой попыткой
+
     if (username && password) {
       isLoading = true; // Включаем индикатор загрузки
 
@@ -31,16 +36,21 @@
           body: requestBody,
         });
 
-        const data = await response.json();
+        const data: { message?: string; access_token?: string } = await response.json(); // Типизация данных ответа
 
         if (response.ok) {
-          setCookie("auth_token", data.access_token);
+          setCookie("auth_token", data.access_token!); // Используем `!` для уверенности, что access_token присутствует
           goto("/lk/user"); // Переход на страницу после успешного входа
         } else {
-          errorMessage = data.message || "Что-то пошло не так";
+          errorMessage = data.message || "Неправильный логин или пароль";
         }
       } catch (error) {
-        errorMessage = "Ошибка при отправке данных: " + error.message;
+        // Типизация ошибки, учитывая, что это может быть объект ошибки
+        if (error instanceof Error) {
+          errorMessage = "Ошибка при отправке данных: " + error.message;
+        } else {
+          errorMessage = "Неизвестная ошибка";
+        }
       } finally {
         isLoading = false; // Отключаем индикатор загрузки
       }
@@ -49,8 +59,8 @@
     }
   };
 
-  // Обработчик для перехода на страницу регистрации
-  const goToRegistration = () => {
+  // Типизация для функции перехода на страницу регистрации
+  const goToRegistration = (): void => {
     goto("/auntification/registration");
   };
 </script>
@@ -58,6 +68,7 @@
 <Icon id="logo" />
 
 <div class="page-container">
+  <!-- svelte-ignore a11y_click_events_have_key_events -->
   <div class="login-container">
     <h1 class="title">Вход</h1>
     <input type="text" placeholder="Почта" bind:value={username} />
@@ -77,6 +88,7 @@
       {/if}
     </button>
     
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div class="register-text" on:click={goToRegistration}>
       Зарегистрироваться
     </div>
@@ -84,7 +96,6 @@
 </div>
 
 <style>
-
   /* Стили для общего контейнера */
   .page-container {
     padding: 0;
@@ -155,6 +166,7 @@
     align-items: center;
     justify-content: center;
     font-family: "Font Over", sans-serif;
+    margin-top: 10px;
   }
 
   .btn:disabled {

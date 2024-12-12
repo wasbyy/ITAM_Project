@@ -67,8 +67,17 @@
     <!-- Основная панель входа -->
     <div class="login-container">
       <h1 class="title">Вход</h1>
+
+      <!-- Поля для ввода логина и пароля -->
       <input type="text" placeholder="Почта" bind:value={username} />
       <input type="password" placeholder="Пароль" bind:value={password} />
+
+      <!-- Уведомление об ошибке -->
+      {#if errorMessage}
+        <p class="error-message">{errorMessage}</p>
+      {/if}
+
+      <!-- Кнопка для отправки формы -->
       <button class="btn" on:click={handleLogin} disabled={isLoading}>
         {#if isLoading}
           Загрузка...
@@ -76,10 +85,6 @@
           Войти
         {/if}
       </button>
-
-      {#if errorMessage}
-        <p class="error-message">{errorMessage}</p>
-      {/if}
     </div>
   </div>
 </div>
@@ -151,7 +156,6 @@
     font-weight: 100;
     font-size: 20px;
     font-family: "Font Over";
- 
   }
 
   /* Эффект при наведении */
@@ -166,10 +170,11 @@
     box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1); /* Легкая тень */
   }
 
+  /* Стили для сообщения об ошибке */
   .error-message {
-    margin-top: 1rem;
+    margin-bottom: 0.4rem;  /* Отступ снизу */
     color: red;
-    font-size: 1rem;
+    font-size: 0.9rem;
   }
 
   /* Мобильная адаптация */

@@ -1,75 +1,86 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-    import { goto } from "$app/navigation";
-    import { BASE_URL } from "../../../config";
-    import Icon from "$lib/components/Icon.svelte";
-    import { eraseCookie, getCookie } from "$lib/utils/utilCookie";
-    import { formatDateTime } from "$lib/utils/utilTime";
-  
-    type Event = {
-      event_id: number;
-      event_name: string;
-      date: string;
-    };
-  
-    type UserInfo = {
-      user_id: number;
-      name: string;
-      email: string;
-      telephone_number: string;
-      course: number;
-      university_group: string;
-    };
-  
-    export let data: { events: Event[]; error?: string; loading?: boolean };
-  
-    let userInfo: UserInfo | null = null;
-    let error: string | null = null;
-  
-    const authToken = getCookie("auth_token");
-  
-    async function fetchUserInfo() {
-      if (!authToken) {
-        error = "Токен аутентификации не найден";
-        return;
-      }
-  
-      try {
-        const response = await fetch(`${BASE_URL}/users_info`, {
-          method: "GET",
-          headers: {
-            Authorization: `${authToken}`,
-            "Content-Type": "application/json",
-          },
-        });
-  
-        if (!response.ok) {
-          const { message } = await response.json();
-          throw new Error(message || "Не удалось получить данные пользователя");
-        }
-  
-        userInfo = await response.json(); // Сохраняем полученные данные
-      } catch (err) {
-        error = err.message || "Произошла ошибка при получении данных";
-      }
+  import { onMount } from "svelte";
+  import { goto } from "$app/navigation";
+  import { BASE_URL } from "../../../config";
+  import Icon from "$lib/components/Icon.svelte";
+  import { eraseCookie, getCookie } from "$lib/utils/utilCookie";
+  import { formatDateTime } from "$lib/utils/utilTime";
+
+  // Define types for Event and UserInfo
+  type Event = {
+    event_id: number;
+    event_name: string;
+    date: string;
+  };
+
+  type UserInfo = {
+    user_id: number;
+    name: string;
+    email: string;
+    telephone_number: string;
+    course: number;
+    university_group: string;
+  };
+
+  // Define the type for data prop
+  export let data: {
+    events: Event[];
+    error?: string;
+    loading?: boolean;
+  };
+
+  let userInfo: UserInfo | null = null;
+  let error: string | null = null;
+
+  // Get the auth token from cookies
+  const authToken = getCookie("auth_token");
+
+  // Function to fetch user info
+  async function fetchUserInfo(): Promise<void> {
+    if (!authToken) {
+      error = "Токен аутентификации не найден";
+      return;
     }
-  
-    function logout(): void {
-      eraseCookie("auth_token");
+
+    try {
+      const response = await fetch(`${BASE_URL}/users_info`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        const { message } = await response.json();
+        throw new Error(message || "Не удалось получить данные пользователя");
+      }
+
+      userInfo = await response.json(); // Save fetched data
+    } catch (err: any) {
+      error = err.message || "Произошла ошибка при получении данных";
+    }
+  }
+
+  // Function to handle logout
+  function logout(): void {
+    eraseCookie("auth_token");
+    goto("/");
+  }
+
+  // Function to go to the archive
+  function goToArchive(): void {
+    if (authToken) {
+      goto(`/archieve/user/`);
+    } else {
       goto("/");
+      console.error("Токен не найден");
     }
-  
-    function goToArchive(): void {
-      if (authToken) {
-        goto(`/archieve/user/`);
-      } else {
-        goto("/");
-        console.error("Токен не найден");
-      }
-    }
-  
-    onMount(fetchUserInfo); // Получаем данные пользователя при монтировании компонента
-  </script>
+  }
+
+  onMount(fetchUserInfo); // Fetch user data on component mount
+</script>
+
   
   <div class="global-container">
     <div class="container">

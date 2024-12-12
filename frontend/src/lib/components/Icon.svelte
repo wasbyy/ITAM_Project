@@ -12,6 +12,7 @@
   }
 </script>
 
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <style>
   /* Общий контейнер для иконки */
   .icon-container {
@@ -70,6 +71,7 @@
 </style>
 
 <!-- Контейнер для иконки, с динамическим классом для выравнивания -->
+<!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
   class="icon-container {left ? 'left' : 'right'}"
   on:click={navigateHome}

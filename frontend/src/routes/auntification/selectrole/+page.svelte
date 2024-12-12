@@ -59,7 +59,7 @@
   .glow-on-hover {
     width: 500px;
     height: 90px;
-    padding-top: 20px;
+    padding: 25px;
     border: 3px solid white;
     outline: none;
     background: white;
@@ -67,7 +67,7 @@
     position: relative;
     z-index: 0;
     border-radius: 50px;
-    font-size: 40px;
+    font-size: 34px;
     font-family: "Font Over";
     font-weight: 400;
     color: white;
@@ -153,7 +153,8 @@
     .glow-on-hover {
       width: 300px;
       height: 60px;
-      font-size: 30px;
+      font-size: 24px;
+      padding: 15px;
     }
 
     /* Изменяем контейнер кнопок на вертикальный */

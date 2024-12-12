@@ -114,6 +114,8 @@
 
       {#if events.length > 0}
         {#each events as event}
+          <!-- svelte-ignore a11y_no_static_element_interactions -->
+          <!-- svelte-ignore a11y_click_events_have_key_events -->
           <div class="event" on:click={() => goto(`/event/${event.event_id}`)}>
             <div class="event-name-panel">
               <div class="event-name">{event.event_name}</div>
