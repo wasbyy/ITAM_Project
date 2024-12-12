@@ -113,49 +113,32 @@
       </div>
 
       {#if events.length > 0}
-  {#each events as event}
-    <div 
-      class="event" 
-      on:click={() => goto(`/event/${event.event_id}`)}
-    >
-      <div class="event-name-panel">
-        <div class="event-name">{event.event_name}</div>
-      </div>
-      <div class="buttons">
-        <button 
-          class="stats-btn" 
-          on:click={(e) => {
-            e.stopPropagation(); // Остановить всплытие события
-            viewStatistics(event.event_id);
-          }}
-        >
-          Статистика
-        </button>
-        <button 
-          class="edit-btn" 
-          on:click={(e) => {
-            e.stopPropagation(); // Остановить всплытие события
-            editEvent(event.event_id);
-          }}
-        >
-          Редактировать
-        </button>
-      </div>
-    </div>
-  {/each}
-{:else if error}
-  <p class="error">{error}</p>
-{:else}
-  <p>Загрузка мероприятий...</p>
-{/if}
-
+        {#each events as event}
+          <div class="event" on:click={() => goto(`/event/${event.event_id}`)}>
+            <div class="event-name-panel">
+              <div class="event-name">{event.event_name}</div>
+            </div>
+            <div class="buttons">
+              <button class="stats-btn" on:click={(e) => { e.stopPropagation(); viewStatistics(event.event_id); }}>
+                Статистика
+              </button>
+              <button class="edit-btn" on:click={(e) => { e.stopPropagation(); editEvent(event.event_id); }}>
+                Редактировать
+              </button>
+            </div>
+          </div>
+        {/each}
+      {:else if error}
+        <p class="error">{error}</p>
+      {:else}
+        <p>Загрузка мероприятий...</p>
+      {/if}
     </div>
   </div>
 </div>
 
 <style>
-  /* Глобальные стили для всей страницы */
-  .app-container {
+    .app-container {
     color: white;
     display: flex;
     flex-direction: column;
@@ -182,6 +165,8 @@
     margin-bottom: 30px;
     padding-left: 4%;
     margin-top: 1.5%;
+    
+    
   }
   
   .profile-icon {
@@ -359,6 +344,7 @@
     z-index: 1000; /* Поверх всего контента */
   }
   
+
   /* Адаптивные стили для мобильных устройств */
   @media (max-width: 768px) {
     .logo {
@@ -367,57 +353,84 @@
       right: 40px;
     }
     .title {
-      font-size: 36px; /* Для мобильных устройств */
+      font-size: 28px;
     }
     .subtitle {
-      font-size: 20px;
-    }
-    .profile-icon {
-      width: 60px; /* Уменьшен для мобильных */
-      height: 60px;
-    }
-    .events-header h2 {
-      font-size: 30px;
-    }
-    .event {
-      height: 50px;
-    }
-    .event-name {
-      font-size: 16px;
-    }
-    .buttons {
-      gap: 10px;
-    }
-    button {
-      font-size: 14px;
-      padding: 8px 10px;
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .title {
-      font-size: 24px;
-    }
-    .subtitle {
-      font-size: 16px;
+      font-size: 18px;
     }
     .profile-icon {
       width: 50px;
       height: 50px;
     }
+    .events-header h2 {
+      font-size: 24px;
+    }
     .event {
-      height: 40px;
+      height: 45px;
     }
     .event-name {
-      font-size: 12px;
+      font-size: 10px;
     }
     .buttons {
       gap: 8px;
     }
     button {
       font-size: 12px;
-      padding: 8px 10px;
+      padding: 4px 5px;
     }
   }
-</style>
 
+  @media (max-width: 480px) {
+    .title {
+      font-size: 20px;
+      margin-top: 40px;
+
+    }
+    .subtitle {
+      font-size: 12px;
+    }
+    .profile-icon {
+      width: 40px;
+      height: 40px;
+      margin-top: 40px;
+
+    }
+    .event {
+      height: 40px;
+    }
+    .event-name {
+      font-size: 10px;
+    }
+    .event{
+      height: 25px;
+    }
+    .buttons {
+      gap: 6px;
+    }
+    button {
+      font-size: 8px;
+      padding: 6px 8px;
+    }
+    .archive-btn {
+    font-size: 10px;
+    padding: 2px 10px;
+    height: 30px;
+    margin-top: 10px;
+  }
+  .create-btn{
+    font-size: 10px;
+    padding: 5px 20px;
+    height: 30px;
+    margin-top: 10px;
+
+
+  }
+  .logout-btn{
+    font-size: 12px;
+    margin-top: 50px;
+  }
+  }
+  
+  
+  
+</style>

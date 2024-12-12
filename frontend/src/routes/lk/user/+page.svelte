@@ -172,6 +172,7 @@
     margin-bottom: 30px;
     padding-left: 4%;
     margin-top: 1.5%;
+    
   }
 
   .profile-container {
@@ -453,7 +454,7 @@
   .event-name-panel {
     background-color: #171615;
     width: 50%;
-    height: 40%; /* Уменьшена высота панели */
+    height: 60%; /* Уменьшена высота панели */
     padding: 5px 50px; /* Уменьшен внутренний отступ */
     border-radius: 15px;
     display: flex;
@@ -536,4 +537,102 @@
     right: 80px;
     top: 60px;
   }
+  @media (max-width: 768px) {
+  .logo {
+    width: 80px;
+    top: 20px;
+    right: 20px;
+  }
+  .profile-glow {
+    display: none;
+  }
+  .title {
+    font-size: 48px;
+  }
+
+  .subtitle {
+    font-size: 22px;
+  }
+
+  .profile-container {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 30px
+
+  }
+
+  .profile-image {
+    width: 80px;
+    height: 80px;
+
+  }
+
+  .events-header h2 {
+    font-size: 28px;
+  }
+
+  .event-name {
+    font-size: 18px;
+  }
+
+  .buttons button {
+    font-size: 14px;
+    padding: 6px 12px;
+  }
+
+  .event {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #242423;
+    padding: 5px;
+    border-radius: 15px;
+    margin-bottom: 12px;
+    height: 50px;
+    width: 90%;
+  }
+
+  .event-name-panel {
+    background-color: #171615;
+    width: 50%;
+    height: 70%;
+    padding: 5px 10px;
+    border-radius: 15px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .buttons {
+    flex-direction: row;
+    gap: 10px;
+    justify-content: space-between;
+  }
+
+  .data-panel {
+    font-size: 18px;
+    min-width: 150px;
+    padding: 10px 15px;
+  }
+
+  .data-panels {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .archive-btn {
+    font-size: 16px;
+    padding: 6px 18px;
+    margin-top: 10px;
+  }
+
+  .logout-btn {
+    font-size: 18px;
+    padding: 10px 20px;
+    border-radius: 30px;
+    cursor: pointer;
+  }
+
+}
 </style>

@@ -4,74 +4,87 @@
   import { setCookie } from "$lib/utils/utilCookie";
   let username: string = "";
   let password: string = "";
+  let isLoading: boolean = false;  // Состояние загрузки
+  let errorMessage: string | null = null;  // Состояние для ошибок
   import { BASE_URL } from "../../../../config";
 
   const handleLogin = async () => {
-    console.log("handleLogin called");
-
+    errorMessage = null;  // Сбрасываем ошибку перед новой попыткой
     if (username && password) {
-      console.log("Credentials entered:", { username, password });
+      isLoading = true; // Включаем индикатор загрузки
 
       try {
-        // Кодируем данные в формате application/x-www-form-urlencoded
         const requestBody = new URLSearchParams({
           grant_type: "password",
           username: username,
           password: password,
-          scope: "read write", // Если scope не обязательное, можно оставить пустым или убрать
-          client_id: "", // Добавьте client_id, если это нужно
-          client_secret: "", // Добавьте client_secret, если это нужно
+          scope: "read write",
+          client_id: "", 
+          client_secret: "",
         }).toString();
-
-        console.log("Sending request with body:", requestBody); // Логируем тело запроса
 
         const response = await fetch(`${BASE_URL}/login/token`, {
           method: "POST",
           headers: {
-            "Content-Type": "application/x-www-form-urlencoded", // Указываем нужный заголовок
+            "Content-Type": "application/x-www-form-urlencoded",
           },
-          body: requestBody, // Отправляем данные в теле запроса
+          body: requestBody,
         });
 
-        console.log("Response status:", response.status); // Логируем статус ответа
         const data = await response.json();
-        console.log("Response data:", data);
 
         if (response.ok) {
-          console.log("Login successful:", data);
           setCookie("auth_token", data.access_token);
-          goto("/lk/user"); // Переход по маршруту
+          goto("/lk/user"); // Переход на страницу после успешного входа
         } else {
-          console.log("Error:", data.message || "Что-то пошло не так");
+          errorMessage = data.message || "Что-то пошло не так";
         }
       } catch (error) {
-        console.error("Ошибка при отправке данных:", error);
+        errorMessage = "Ошибка при отправке данных: " + error.message;
+      } finally {
+        isLoading = false; // Отключаем индикатор загрузки
       }
     } else {
-      console.log("Заполните все поля!");
+      errorMessage = "Заполните все поля!";
     }
   };
 
   // Обработчик для перехода на страницу регистрации
   const goToRegistration = () => {
-    goto("/auntification/registration"); // Переход по маршруту
+    goto("/auntification/registration");
   };
 </script>
+
 <Icon id="logo" />
 
 <div class="page-container">
   <div class="login-container">
     <h1 class="title">Вход</h1>
-    <input type="text" placeholder="Логин" bind:value={username} />
+    <input type="text" placeholder="Почта" bind:value={username} />
     <input type="password" placeholder="Пароль" bind:value={password} />
-    <button class="btn" on:click={handleLogin}>Войти</button>
-    <button class="register-text" on:click={goToRegistration}>
-      Зарегистрироваться
+    
+    <!-- Показ ошибки -->
+    {#if errorMessage}
+      <div class="error-message">{errorMessage}</div>
+    {/if}
+
+    <!-- Кнопка с индикатором загрузки -->
+    <button class="btn" on:click={handleLogin} disabled={isLoading}>
+      {#if isLoading}
+        <span class="spinner"></span> Загрузка...
+      {:else}
+        Войти
+      {/if}
     </button>
+    
+    <div class="register-text" on:click={goToRegistration}>
+      Зарегистрироваться
+    </div>
   </div>
 </div>
 
 <style>
+
   /* Стили для общего контейнера */
   .page-container {
     padding: 0;
@@ -85,7 +98,7 @@
     background-image: url("/authUser.png");
     background-size: cover;
   }
-
+  
   /* Стили для контейнера входа */
   .login-container {
     position: relative;
@@ -99,14 +112,7 @@
     align-items: center;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6); /* Тень */
     border: 2px solid #666666; /* Обводка панели */
-  }
-
-
-
-  @keyframes greenGradient {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    
   }
 
   .login-container h1 {
@@ -114,7 +120,8 @@
     margin-top: -0.5rem;
     margin-bottom: 2rem;
     color: #e0e0e0;
-    font-weight: bold;
+    font-weight:8 00;
+    
   }
 
   .login-container input {
@@ -129,13 +136,13 @@
     font-size: 1rem;
     text-align: left;
     transition: background 0.3s ease;
+    
   }
 
   .login-container input:focus {
     background: rgba(255, 255, 255, 0.2);
   }
 
-  /* Стили для кнопки Войти */
   .btn {
     position: relative;
     background: transparent; /* Прозрачный фон */
@@ -147,16 +154,26 @@
     width: 50%;
     transition: all 0.3s ease;
     font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Font Over", sans-serif;
+
+  }
+
+  .btn:disabled {
+    background-color: #444444;
+    cursor: not-allowed;
   }
 
   .btn:hover {
     transform: scale(1.05);
-    box-shadow: 0 2px 10px rgba(255, 255, 255, 0.3); /* Белая тень при наведении */
+    box-shadow: 0 2px 10px rgba(255, 255, 255, 0.3);
   }
 
   .btn:active {
     transform: scale(0.95);
-    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.3); /* Белая тень при клике */
+    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.3);
   }
 
   .register-text {
@@ -166,28 +183,38 @@
     color: #e0e0e0;
     cursor: pointer;
     color: #7826ca;
+    
   }
 
   .register-text:hover {
     color: #8a29eb92;
   }
 
-  .register-text {
-    background: none;
-    border: none;
-    color: inherit;
-    font: inherit;
-    cursor: pointer;
-    padding: 0;
-    color: #5e1da8
-  }
-
-  .register-text:hover {
-    text-decoration: none;
-  }
-
   .register-text:focus {
     outline: none;
+  }
+
+  /* Стили для ошибки */
+  .error-message {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+  }
+
+  /* Индикатор загрузки (спиннер) */
+  .spinner {
+    border: 3px solid #f3f3f3; /* Светлый фон спиннера */
+    border-top: 3px solid #3498db; /* Синий цвет для верхней части */
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite; /* Анимация вращения */
+    margin-right: 10px; /* Расстояние между спиннером и текстом */
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
   }
 
   @media (max-width: 768px) {

@@ -99,7 +99,7 @@
     .grid {
         display: flex;
         flex-wrap: wrap;
-        gap: 20px;
+        gap: 40px;
         justify-content: center;
     }
 
@@ -159,14 +159,14 @@
         }
 
         .card {
-            width: 48%;  /* Карточки занимают 48% ширины контейнера */
+            width: 100%;  /* Карточки на весь экран */
             max-width: 320px; /* Ограничение ширины */
             margin-bottom: 20px;  /* Отступ снизу */
         }
 
         .grid {
-            flex-wrap: wrap; /* Карточки переносятся на следующую строку */
-            justify-content: space-between; /* Пробел между карточками */
+            flex-direction: column; /* Карточки вертикально */
+            align-items: center; /* Центрируем карточки */
         }
 
         .card-title {
@@ -207,4 +207,3 @@
         </div>
     {/if}
 </div>
-    

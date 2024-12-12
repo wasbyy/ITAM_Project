@@ -59,6 +59,7 @@
   .glow-on-hover {
     width: 500px;
     height: 90px;
+    padding-top: 20px;
     border: 3px solid white;
     outline: none;
     background: white;
@@ -66,8 +67,8 @@
     position: relative;
     z-index: 0;
     border-radius: 50px;
-    font-size: 55px;
-    font-family: "Pixelify Sans", serif;
+    font-size: 40px;
+    font-family: "Font Over";
     font-weight: 400;
     color: white;
     display: flex; /* Flexbox для центрирования */

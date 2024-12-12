@@ -84,7 +84,11 @@
       <div class="logo">
         <img src="/itam_logo.png" alt="Логотип" />
       </div>
-      {#if isAuthenticated && isRoleLoaded}
+      
+      {#if isLoading}
+        <!-- Индикатор загрузки -->
+        <div class="loading-indicator">Загрузка...</div>
+      {:else if isAuthenticated && isRoleLoaded}
         <button
           class="profile-btn"
           on:click={() => goto(userRole === '"admin"' ? "/lk/admin" : userRole === '"user"' ? "/lk/user" : "/error")}
@@ -95,6 +99,7 @@
         <button class="login-btn" on:click={() => goto("/auntification/selectrole")}>Вход</button>
       {/if}
     </div>
+    
     <h1 class="title">Мероприятия</h1>
   </div>
 
@@ -138,21 +143,22 @@
     <div class="footer-credits">
       <div class="footer-role">
         <p>Frontend</p>
-        <p>@Wasbyy</p>
+        <p><a href="https://t.me/Wasbyy" target="_blank">@Wasbyy</a></p>
       </div>
       <div class="footer-role">
         <p>Backend</p>
-        <p>@dontpaniczy</p>
+        <p><a href="https://t.me/dontpaniczy" target="_blank">@dontpaniczy</a></p>
       </div>
       <div class="footer-role">
         <p>Design</p>
-        <p>@aantaars</p>
-        <p>@kisssssssik</p>
-        <p>@thePolishaz3</p>
+        <p><a href="https://t.me/aantaars" target="_blank">@aantaars</a></p>
+        <p><a href="https://t.me/kisssssssik" target="_blank">@kisssssssik</a></p>
+        <p><a href="https://t.me/thePolishaz3" target="_blank">@thePolishaz3</a></p>
       </div>
     </div>
   </div>
 </footer>
+
 
 </div>
 
@@ -184,6 +190,17 @@
   z-index: 1; /* Заголовок над фоном */
 }
 
+.loading-indicator {
+  color: white;
+  font-size: 0.5rem;
+  margin-right: 30px;
+  border: 2px white solid;
+  border-radius: 30px;
+  padding: 5px 5px;
+  text-transform: uppercase;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+}
 
   /* Фон для страницы */
 /* Фон для страницы */
@@ -215,7 +232,7 @@
     font-size: 1rem;
     text-transform: uppercase;
   }
-
+  
   .login-btn,
   .profile-btn {
     margin-right: 2rem;
@@ -375,6 +392,8 @@
     font-weight: bold; /* Полужирное начертание */
     align-self: flex-start; /* Выравниваем заголовок по левому краю */
     letter-spacing: 1px; /* Увеличиваем расстояние между буквами */
+    font-family: "Font Over";
+
   }
 
   /* Контейнер для тегов */
@@ -606,6 +625,17 @@
   color: #a0a0a0; /* Серый цвет для ролей */
   font-size: 14px;
   margin-bottom: 5px;
+}
+.footer a {
+  color: #ffffff; /* Синий цвет для ссылок */
+  text-decoration: none; /* Убираем подчеркивание */
+  font-weight: bold; /* Сделаем ссылки жирными */
+  transition: color 0.3s; /* Плавный переход для цвета */
+}
+
+.footer a:hover {
+  color: #858585; /* Цвет при наведении */
+  text-decoration: underline; /* Подчеркивание при наведении */
 }
 
 </style>

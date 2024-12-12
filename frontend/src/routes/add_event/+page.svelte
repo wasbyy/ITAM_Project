@@ -177,7 +177,7 @@
 
 h1 {
     font-size: 42px;
-    font-family: 'Press Start 2P', monospace;
+    font-family: "Font Over";
     color: white;
     margin-top: 80px;
     margin-bottom: 30px;

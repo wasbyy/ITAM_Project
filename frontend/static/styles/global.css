@@ -6,3 +6,7 @@ body,html{
     overflow-x: hidden; /* Отключаем горизонтальную прокрутку */
     font-family: "Inter", sans-serif; /* Устанавливаем шрифт для страницы */
   }
+  @font-face {
+    font-family: 'Font Over';
+    src: url('/src/assets/fonts/FontOver.otf') format('opentype');
+  }

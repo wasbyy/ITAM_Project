@@ -288,6 +288,9 @@
     flex-wrap: nowrap;
     width: 100%;
     justify-content: flex-start;
+    font-family: "Font Over";
+
+
   }
 
   .event-photo {
@@ -321,7 +324,7 @@
     font-weight: bold;
     margin: 0;
     margin-bottom: 15px;
-    font-family: "Press Start 2P", monospace; /* Шрифт в стиле ретро */
+    font-family: "Font Over";
   }
 
   .event-meta {
@@ -332,6 +335,10 @@
     font-family: 'Inter', sans-serif;
   }
 
+  .event-participants{
+    font-family: "Font Over";
+
+  }
   .event-format,
   .event-participants {
     font-size: 24px;
