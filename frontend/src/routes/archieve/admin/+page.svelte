@@ -3,7 +3,7 @@
     import Icon from "$lib/components/Icon.svelte";
     import { BASE_URL } from "../../../config";
     import { getCookie } from "$lib/utils/utilCookie"; // Импортируем функцию для получения куки
-    import { goto } from "$app/navigation";
+    import { goto } from "$app/navigation"; // Импортируем функцию для навигации
 
     // Тип данных для завершенных мероприятий
     interface CompletedEvent {
@@ -82,6 +82,11 @@
     onMount(() => {
         loadCompletedEvents();
     });
+
+    // Функция для обработки клика по мероприятию
+    function handleEventClick(eventId: number) {
+        goto(`/event/${eventId}`);
+    }
 </script>
 
 <style>
@@ -135,6 +140,7 @@
         flex-direction: column;
         align-items: center;
         justify-content: flex-start;
+        cursor: pointer; /* Добавим курсор при наведении */
     }
 
     .card:hover {
@@ -196,7 +202,7 @@
     <h1>Завершенные мероприятия</h1>
     <div class="grid">
         {#each events as event}
-            <div class="card">
+            <div class="card" on:click={() => handleEventClick(event.event_id)}>
                 <img src={event.image} alt={event.event_name} />
                 <div class="card-title">{event.event_name}</div>
                 <div class="card-date">{event.date}</div>

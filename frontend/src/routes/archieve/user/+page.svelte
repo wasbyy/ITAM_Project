@@ -199,7 +199,7 @@
         <h1>Архивные мероприятия</h1>
         <div class="grid">
             {#each events as event}
-            <a href={`/archive_event/${event.event_id}`} class="card">
+            <a href={`/event/${event.event_id}`} class="card">
                 <img src={event.image} alt={event.event_name} />
                 <div class="card-title">{event.event_name}</div>
             </a>

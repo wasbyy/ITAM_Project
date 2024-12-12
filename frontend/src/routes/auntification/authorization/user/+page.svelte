@@ -71,7 +71,7 @@
     <!-- Кнопка с индикатором загрузки -->
     <button class="btn" on:click={handleLogin} disabled={isLoading}>
       {#if isLoading}
-        <span class="spinner"></span> Загрузка...
+        Загрузка...
       {:else}
         Войти
       {/if}
@@ -112,7 +112,6 @@
     align-items: center;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6); /* Тень */
     border: 2px solid #666666; /* Обводка панели */
-    
   }
 
   .login-container h1 {
@@ -120,8 +119,7 @@
     margin-top: -0.5rem;
     margin-bottom: 2rem;
     color: #e0e0e0;
-    font-weight:8 00;
-    
+    font-weight: bold;
   }
 
   .login-container input {
@@ -136,7 +134,6 @@
     font-size: 1rem;
     text-align: left;
     transition: background 0.3s ease;
-    
   }
 
   .login-container input:focus {
@@ -158,7 +155,6 @@
     align-items: center;
     justify-content: center;
     font-family: "Font Over", sans-serif;
-
   }
 
   .btn:disabled {
@@ -183,7 +179,6 @@
     color: #e0e0e0;
     cursor: pointer;
     color: #7826ca;
-    
   }
 
   .register-text:hover {
@@ -199,22 +194,6 @@
     color: red;
     font-size: 0.9rem;
     margin-top: 1rem;
-  }
-
-  /* Индикатор загрузки (спиннер) */
-  .spinner {
-    border: 3px solid #f3f3f3; /* Светлый фон спиннера */
-    border-top: 3px solid #3498db; /* Синий цвет для верхней части */
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    animation: spin 1s linear infinite; /* Анимация вращения */
-    margin-right: 10px; /* Расстояние между спиннером и текстом */
-  }
-
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
   }
 
   @media (max-width: 768px) {

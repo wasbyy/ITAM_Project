@@ -342,8 +342,13 @@
     height: auto;
     cursor: pointer;
     z-index: 1000; /* Поверх всего контента */
+    transition: transform 0.3s ease-in-out; /* Анимация при наведении */
+
   }
-  
+  .logo:hover{
+    transform: scale(1.1); /* Увеличение при наведении */
+
+  }
 
   /* Адаптивные стили для мобильных устройств */
   @media (max-width: 768px) {

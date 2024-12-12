@@ -536,6 +536,12 @@
     position: absolute;
     right: 80px;
     top: 60px;
+    transition: transform 0.3s ease-in-out; /* Анимация при наведении */
+
+  }
+  .logo:hover{
+    transform: scale(1.1); /* Увеличение при наведении */
+
   }
   @media (max-width: 768px) {
   .logo {
