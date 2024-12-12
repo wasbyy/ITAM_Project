@@ -184,7 +184,6 @@
   position: relative; /* Не используем абсолютное позиционирование */
   font-size: 85px; /* Размер шрифта заголовка */
   color: white; /* Белый цвет текста */
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.4); /* Тень для текста */
   text-transform: uppercase; /* Преобразуем текст в верхний регистр */
   font-family: "Press Start 2P", monospace; /* Шрифт в стиле ретро */
   z-index: 1; /* Заголовок над фоном */
